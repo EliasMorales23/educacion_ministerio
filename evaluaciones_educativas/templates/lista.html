@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista</title>
+  </head>
+  <body>
+    <h1>alumnos</h1>
+    <ul>
+      {% for alumno in lista_alumnos %}
+      <li>
+        {{ alumno.nombre }}
+        <a href="{% url 'editar_alumno' alumno_public_id=alumno.public_id %}"
+          >Editar</a
+        >
+      </li>
+      {% endfor %}
+    </ul>
+    <h2>Evaluaciones</h2>
+    <table>
+      <tbody>
+        {% for eval in evaluciones %}
+        <tr>
+          <td>
+            {{ eval.pk }}{{ eval.alumno_id }}{{ eval.pregunta_1 }}<a
+              href="{% url 'editar_evaluacion' alumno_public_id=eval.alumno.public_id %}"
+              >Editar evaluacion</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'carga_alumno'  %}">Añadir un nuevo alumno</a>
+  </body>
+</html>
