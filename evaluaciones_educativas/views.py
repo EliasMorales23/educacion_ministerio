@@ -30,7 +30,7 @@ def carga_alumno(request):
                     nombre_grado=nombre_grado,
                     cueanexo=cueanexo_grado
                     )
-                #print(creado_grado)
+                # print(creado_grado)
                 #-----------------logica para no repetir seccion seccion----------
                 turno_seccion=seccion_form.cleaned_data["turno"]
                 nombre_seccion=seccion_form.cleaned_data["seccion"]
