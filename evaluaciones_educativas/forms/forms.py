@@ -9,20 +9,21 @@ class AlumnoForm(forms.ModelForm):
 		#widget  para cambiar tipo de campo
 		widgets = {
             'dni': forms.TextInput(attrs={
-                'required': 'true',          # Hace el campo obligatorio en HTML
-                'minlength': '8',           # Restricción de longitud HTML
-                'placeholder': 'Ingresa el dni del alumnno',
+                'required': 'true',         
+                'minlength': '8',
+				'maxlength':'8',
+                'placeholder': 'Ingresa el dni del alumno',
 				'pattern': '[0-9]*'
             }),
 			'nombre': forms.TextInput(attrs={
                 'required': 'true', 
-                'placeholder': 'Ingresa el Nombre del alumnno',
-				'pattern': '[a-z]*'
+                'placeholder': 'Ingresa el Nombre del alumno',
+				'pattern': '[A-Z]*'
 			}),
 			'apellido': forms.TextInput(attrs={
                 'required': 'true', 
-                'placeholder': 'Ingresa el Apellido del alumnno',
-				'pattern': '[a-z]*'
+                'placeholder': 'Ingresa el Apellido del alumno',
+				'pattern': '[A-Z]*'
 			})
 			}
 		#label para cambiar nombre de campo
@@ -44,7 +45,7 @@ class AsistenciaForm(forms.Form):
 class GradoForm(forms.ModelForm):
 	class Meta:
 		model = Grado
-		fields='__all__'
+		fields=['nombre_grado','cueanexo']
 		#ocultamos cueanexo
 		# widgets = {
 		# 	'cueanexo': forms.HiddenInput(),

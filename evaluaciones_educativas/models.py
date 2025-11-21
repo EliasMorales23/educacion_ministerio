@@ -17,6 +17,7 @@ class Grado(models.Model):
     # ('MANANA', 'Mañana'),
     # ('TARDE', 'Tarde'),
     # ]
+    public_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
     cueanexo = models.IntegerField()#REPRESENTA A ESCUELA
     nombre_grado = models.CharField(max_length=8, choices= OPCIONES_GRADO, default='SEGUNDO')
     #turno = models.CharField(max_length=6, choices=OPCIONES_TURNO, default='MANANA' )
