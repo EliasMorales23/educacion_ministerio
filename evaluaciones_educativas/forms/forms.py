@@ -49,10 +49,12 @@ class GradoForm(forms.ModelForm):
 		# widgets = {
 		# 	'cueanexo': forms.HiddenInput(),
 		# 	}
+	#solucion para evitar no seleccionar un unique desde el form	
+
 		
 
 
 class SeccionForm(forms.ModelForm):
 	class Meta:
 		model = Seccion
-		fields=['seccion']
+		fields=['seccion','turno']

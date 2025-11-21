@@ -5,25 +5,25 @@ import uuid
 
 class Grado(models.Model):
     OPCIONES_GRADO = [
-    ('PRIMERO', '1er Grado'),
+    # ('PRIMERO', '1er Grado'),
     ('SEGUNDO', '2do Grado'),
     ('TERCERO', '3er Grado'),
-    ('CUARTO', '4to Grado'),
-    ('QUINTO', '5to Grado'),
-    ('SEXTO', '6to Grado'),
-    ('SEPTIMO', '7mo Grado'),
+    # ('CUARTO', '4to Grado'),
+    # ('QUINTO', '5to Grado'),
+    # ('SEXTO', '6to Grado'),
+    # ('SEPTIMO', '7mo Grado'),
     ]
-    OPCIONES_TURNO = [
-    ('MANANA', 'Mañana'),
-    ('TARDE', 'Tarde'),
-    ]
-    cueanexo = models.IntegerField()
+    # OPCIONES_TURNO = [
+    # ('MANANA', 'Mañana'),
+    # ('TARDE', 'Tarde'),
+    # ]
+    cueanexo = models.IntegerField()#REPRESENTA A ESCUELA
     nombre_grado = models.CharField(max_length=8, choices= OPCIONES_GRADO, default='SEGUNDO')
-    turno = models.CharField(max_length=6, choices=OPCIONES_TURNO, default='MANANA' )
+    #turno = models.CharField(max_length=6, choices=OPCIONES_TURNO, default='MANANA' )
     class Meta:
        #managed = False
         db_table = 'grados' 
-        #unique_together = ('nombre_grado', 'turno')   
+        #unique_together = ('nombre_grado', 'cueanexo')   
     def __str__(self):
         return self.nombre_grado
 
@@ -42,15 +42,20 @@ class Seccion(models.Model):
     ('J', 'J'),
     ('K', 'K'),
     ]
+    OPCIONES_TURNO = [
+    ('MANANA', 'Mañana'),
+    ('TARDE', 'Tarde'),
+    ]
     seccion = models.CharField(max_length=5, choices=OPCIONES_SECCION, default='UNICO')
     grado = models.ForeignKey(Grado, on_delete=models.CASCADE)
+    turno = models.CharField(max_length=6, choices=OPCIONES_TURNO, default='MANANA' )
     class Meta:
         #managed = False
         db_table = 'secciones'
         #unicidad
-        unique_together = ('seccion', 'grado')
+        unique_together = ('seccion', 'grado','turno')
     def __str__(self):
-        nombre_seccion=f'{self.grado}_{self.seccion}'
+        nombre_seccion=f'{self.grado}_{self.seccion}_{self.turno}'
         return nombre_seccion
 
 class Alumno(models.Model):
@@ -76,7 +81,8 @@ class Alumno(models.Model):
         #managed = False
         db_table = 'alumnos'
     def __str__(self):
-        return self.nombre
+        alumno_nombre=f'Alumno:{self.nombre} DNI:{self.dni}'
+        return alumno_nombre
 
 
 class EvaluacionFluidezLectora(models.Model):
@@ -99,9 +105,10 @@ class EvaluacionFluidezLectora(models.Model):
     pregunta_5 = models.CharField(max_length=10,choices= OPCIONES_EVALUACION, default='NORESPONDE',null=True)
     pregunta_6 = models.CharField(max_length=10,choices= OPCIONES_EVALUACION, default='NORESPONDE',null=True)
     asistencia = models.CharField(choices=OPCIONES_ASISTENCIA,default='AUSENTE')
-    alumno = models.ForeignKey(Alumno, on_delete=models.CASCADE)
+    alumno = models.OneToOneField(Alumno,primary_key=True, on_delete=models.CASCADE)
     class Meta:
         #managed = False
         db_table = 'evaluaciones_fluidez_lectora'
-    # def __str__(self):
-    #     return self.id
+    def __str__(self):
+        nombre_examen=f'Examen fluidez lectora de {self.alumno.nombre}'
+        return nombre_examen

@@ -23,7 +23,7 @@
         {% for eval in evaluciones %}
         <tr>
           <td>
-            {{ eval.pk }}{{ eval.alumno_id }}{{ eval.pregunta_1 }}<a
+            Examen fluidez lectora de {{eval.alumno.nombre}}<a
               href="{% url 'editar_evaluacion' alumno_public_id=eval.alumno.public_id %}"
               >Editar evaluacion</a
             >

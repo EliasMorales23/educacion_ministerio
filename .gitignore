@@ -3,6 +3,7 @@ db.sqlite3
 db.sqlite
 *.sqlite
 *.sqlite3
+views.py
 
 # Archivos comunes de Python/Django
 __pycache__/
