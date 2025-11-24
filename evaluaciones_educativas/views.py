@@ -4,13 +4,23 @@ from django.template import loader
 from evaluaciones_educativas.models import *
 from evaluaciones_educativas.forms.forms import *
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 
-
-
+@login_required
 def carga_alumno(request):
+    #def carga_alumno(request, cuaenexo/usuario):
+    #---------logica para obtener cueanexo por medio de username--------------
+    usuario= request.user
+    if usuario.is_authenticated:
+        nombre_usuario_cueanexo=usuario.username
+        valor_inicial={'cueanexo': nombre_usuario_cueanexo}
+        print(nombre_usuario_cueanexo)
+        print(type(nombre_usuario_cueanexo))
+    #--------------------------------------------------------------------
     alumno_form = AlumnoForm()
-    grado_form = GradoForm()
+    grado_form = GradoForm(initial=valor_inicial)
     seccion_form = SeccionForm()
     if request.method == 'POST':
         alumno_form = AlumnoForm(request.POST)
@@ -21,14 +31,16 @@ def carga_alumno(request):
             with transaction.atomic():
                 #--------------------logica para no repetir grado---------------
                 nombre_grado=grado_form.cleaned_data["nombre_grado"]
-                cueanexo_grado=grado_form.cleaned_data["cueanexo"]
+                #cueanexo_grado=grado_form.cleaned_data["cueanexo"]#01
                 #conseguir cueanexo de v_oferta
-                #cueanexo_grado=4
-                #turno_grado=grado_form.cleaned_data["turno"]
+                #cueanexo_grado=4 ACA ES DONDE PSARIAMOS EL CUEANEXO O USUARIO EN LUGAR DE 01
+                #la idea es hacerlo con un TRY para si es de 9 digiots entender que es el cueanexo 
+                #y si es 18 ennder que es el dni+cueanexo
+
                 
                 instancia_grado, creado_grado=Grado.objects.get_or_create(
                     nombre_grado=nombre_grado,
-                    cueanexo=cueanexo_grado
+                    cueanexo=nombre_usuario_cueanexo
                     )
                 # print(creado_grado)
                 #-----------------logica para no repetir seccion seccion----------
@@ -108,8 +120,49 @@ def lista(request,grado_public_id):
         'lista_alumnos': alumnos,
         'evaluciones': evaluacion,
     }
-    
     return render(request,"lista.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+#-----------grado y secciom-------------------------------------
+def grado(request):
+    #def grado(request, cueanexo):
+    cueanexo=1
+    #alumnos = Alumno.objects.filter(discapacidad='SI').order_by('nombre')
+    #evaluacion = EvaluacionFluidezLectora.objects.filter(asistencia='AUSENTE')
+    instancia_grado= Grado.objects.filter(cueanexo=cueanexo)
+    opciones_grado = [('', '-- Elige una Grado --')]
+    for grado in instancia_grado:
+        opciones_grado.append((grado.id, grado.nombre_grado))
+        
+    # 3. Inicializar el formulario
+    form = SeccionViewForm()
+    
+    # 4. Asignar las opciones al campo 'seccion'
+    form.fields['seccion'].choices = opciones_grado
+    contexto = {
+        'form': form
+    }
+    return render(request,"grados.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+
+def seccion(request):
+    
+    #traer secciones que ya existen 
+    #instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
+    instancia_seccion=Seccion.objects.filter(grado_id=1)
+    opciones_seccion = [('', '-- Elige una Sección --')] # El empty_label va primero
+    
+    # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
+    for seccion in instancia_seccion:
+        opciones_seccion.append((seccion.grado_id, seccion.seccion))
+        
+    # 3. Inicializar el formulario
+    form = SeccionViewForm()
+    
+    # 4. Asignar las opciones al campo 'seccion'
+    form.fields['seccion'].choices = opciones_seccion
+    contexto = {
+        'form': form
+    }
+    return render(request,"secciones.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+#---------------------------------------------------------
     
 
 def carga_evaluacion(request, alumno_public_id):
@@ -155,11 +208,20 @@ def editar_evaluacion(request, alumno_public_id):
 
 def asistencia(request,alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
-    instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(alumno_id=alumno_id.id)
+    #SI instanciamos aca se crea antes de que confirme asistencia (puede ser conveniente)...
+    instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
+        alumno_id=alumno_id.id)
     instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    #cueanexo=instancia_grado.cueanexo
+    # #cueanexo=instancia_grado.cueanexo
     grado_public=instancia_grado.public_id
     if request.method == 'POST':
+        #----------LOGICA PARA EVALUACION (asistencia seleccionada)---------
+    #     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
+    #     alumno_id=alumno_id.id)
+    #     instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
+    # #cueanexo=instancia_grado.cueanexo
+    #     grado_public=instancia_grado.public_id
+        #----------------------------------------
         form = AsistenciaForm(request.POST)
         
         if form.is_valid():
@@ -218,3 +280,9 @@ def ausentismo_evaluacion(instancia_evaluacion):
         if not i.primary_key and i.null:
             setattr(instancia_evaluacion, i.name, None)
     return instancia_evaluacion
+
+#logica de logue----------------------
+def salir(request):
+    logout(request)
+    return redirect('accounts/login.html')
+#-----------------------------

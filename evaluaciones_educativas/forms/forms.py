@@ -1,6 +1,13 @@
 from django import forms
 from evaluaciones_educativas.models import *
 
+
+class GradoViewForm(forms.Form):
+	grado= forms.ChoiceField(label='grados', required=False)
+
+class SeccionViewForm(forms.Form):
+	seccion= forms.ChoiceField(label='secciones', required=False)
+
 class AlumnoForm(forms.ModelForm):
 
 	class Meta:
@@ -28,6 +35,8 @@ class AlumnoForm(forms.ModelForm):
 			}
 		#label para cambiar nombre de campo
 
+class AsistenciaForm(forms.Form):
+	asistencia= forms.BooleanField(label='asistencia', required=False)
 
 class EvaluacionFluidezForm(forms.ModelForm):
 	class Meta:
@@ -39,9 +48,6 @@ class EvaluacionFluidezForm(forms.ModelForm):
 			'placeholder':'Ingrese la cantidad de palabras leidas'
 			})}
 
-class AsistenciaForm(forms.Form):
-	asistencia= forms.BooleanField(label='asistencia', required=False)
-
 class GradoForm(forms.ModelForm):
 	class Meta:
 		model = Grado
@@ -51,8 +57,6 @@ class GradoForm(forms.ModelForm):
 		# 	'cueanexo': forms.HiddenInput(),
 		# 	}
 	#solucion para evitar no seleccionar un unique desde el form	
-
-		
 
 
 class SeccionForm(forms.ModelForm):

@@ -111,5 +111,5 @@ class EvaluacionFluidezLectora(models.Model):
         #managed = False
         db_table = 'evaluaciones_fluidez_lectora'
     def __str__(self):
-        nombre_examen=f'Examen fluidez lectora de {self.alumno.nombre}'
+        nombre_examen=f'Examen fluidez lectora de {self.alumno.nombre} {self.alumno.apellido} DNI:{self.alumno.dni}'
         return nombre_examen

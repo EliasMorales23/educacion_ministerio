@@ -3,14 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista</title>
+    <title>Grados</title>
   </head>
   <body>
-    <h1>alumnos</h1>
+    <h1>Grado</h1>
+    <form method="POST">
+      <div>{% csrf_token %} {{ form.as_p }}</div>
+      <button type="submit">Guardar</button>
+    </form>
+    {% comment %}
     <ul>
       {% for alumno in lista_alumnos %}
       <li>
-        {{ alumno.nombre }} {{ alumno.apellido }} DNI: {{ alumno.dni }}
+        {{ alumno.nombre }}
         <a href="{% url 'editar_alumno' alumno_public_id=alumno.public_id %}"
           >Editar</a
         >
@@ -23,8 +28,7 @@
         {% for eval in evaluciones %}
         <tr>
           <td>
-            Examen fluidez lectora de {{eval.alumno.nombre}}
-            {{eval.alumno.apellido}} DNI:{{eval.alumno.dni}}<a
+            Examen fluidez lectora de {{eval.alumno.nombre}}<a
               href="{% url 'editar_evaluacion' alumno_public_id=eval.alumno.public_id %}"
               >Editar evaluacion</a
             >
@@ -34,7 +38,6 @@
       </tbody>
     </table>
     <a href="{% url 'carga_alumno'  %}">Añadir un nuevo alumno</a>
-    {% comment %} borrar {% endcomment %}
-    <a href="{% url 'salir'  %}">cerrar sesion</a>
+    {%endcomment%}
   </body>
 </html>

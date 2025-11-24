@@ -9,9 +9,13 @@ urlpatterns = [
     path('editar_alumno/<uuid:alumno_public_id>/',views.editar_alumno, name= 'editar_alumno'),
 	path('carga_evaluacion/<uuid:alumno_public_id>/',views.carga_evaluacion, name= 'carga_evaluacion'),
 	path('editar_evaluacion/<uuid:alumno_public_id>/',views.editar_evaluacion, name= 'editar_evaluacion'),
-	path('lista/<uuid:grado_public_id>/',views.lista, name='lista'),
+    path('grados/',views.grado, name='grados'),
+	path('secciones/',views.seccion, name='secciones'),
+    path('lista/<uuid:grado_public_id>/',views.lista, name='lista'),
 	path('asistencia/<uuid:alumno_public_id>/',views.asistencia, name='asistencia'),
 	path('editar_asistencia/<uuid:alumno_public_id>/',views.editar_asistencia, name='editar_asistencia'),
 	#INCLUIR LA VISTA PARA LOS ADMIN (DONDE VEO SI LAS ESCUELAS ESTAN CARGANDO)
+    #borrar
+    path('salir/',views.salir, name='salir')
 	
 ]
