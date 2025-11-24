@@ -10,8 +10,9 @@ urlpatterns = [
 	path('carga_evaluacion/<uuid:alumno_public_id>/',views.carga_evaluacion, name= 'carga_evaluacion'),
 	path('editar_evaluacion/<uuid:alumno_public_id>/',views.editar_evaluacion, name= 'editar_evaluacion'),
     path('grados/',views.grado, name='grados'),
-	path('secciones/',views.seccion, name='secciones'),
-    path('lista/<uuid:grado_public_id>/',views.lista, name='lista'),
+	path('secciones/<uuid:grado_public_id>',views.seccion, name='secciones'),
+    path('turnos/<int:seccion_id>',views.turno, name='turnos'),
+	path('lista/<int:seccion_id>/<str:eleccion>/',views.lista, name='lista'),
 	path('asistencia/<uuid:alumno_public_id>/',views.asistencia, name='asistencia'),
 	path('editar_asistencia/<uuid:alumno_public_id>/',views.editar_asistencia, name='editar_asistencia'),
 	#INCLUIR LA VISTA PARA LOS ADMIN (DONDE VEO SI LAS ESCUELAS ESTAN CARGANDO)

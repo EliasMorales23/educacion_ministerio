@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grados</title>
+    <title>TURNO</title>
   </head>
   <body>
-    <h1>Grados</h1>
+    <h1>Turnos</h1>
     <form method="POST">
-      <div>{% csrf_token %} {{ grado_form_data.as_p }}</div>
+      <div>{% csrf_token %} {{ form.as_p }}</div>
       <button type="submit">Guardar</button>
     </form>
     {% comment %}
@@ -38,6 +38,6 @@
       </tbody>
     </table>
     <a href="{% url 'carga_alumno'  %}">Añadir un nuevo alumno</a>
-    {%endcomment%}
+    {% endcomment %}
   </body>
 </html>

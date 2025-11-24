@@ -54,7 +54,7 @@ class Seccion(models.Model):
         #managed = False
         db_table = 'secciones'
         #unicidad
-        unique_together = ('seccion', 'grado','turno')
+        unique_together = ('seccion','grado','turno')
     def __str__(self):
         nombre_seccion=f'{self.grado}_{self.seccion}_{self.turno}'
         return nombre_seccion

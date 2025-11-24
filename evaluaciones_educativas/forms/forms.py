@@ -7,6 +7,9 @@ class GradoViewForm(forms.Form):
 
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)
+	
+class TurnoViewForm(forms.Form):
+	turno= forms.ChoiceField(label='Turnos', required=False)
 
 class AlumnoForm(forms.ModelForm):
 

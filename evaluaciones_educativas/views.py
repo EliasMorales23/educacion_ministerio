@@ -16,8 +16,8 @@ def carga_alumno(request):
     if usuario.is_authenticated:
         nombre_usuario_cueanexo=usuario.username
         valor_inicial={'cueanexo': nombre_usuario_cueanexo}
-        print(nombre_usuario_cueanexo)
-        print(type(nombre_usuario_cueanexo))
+        # print(nombre_usuario_cueanexo)
+        # print(type(nombre_usuario_cueanexo))
     #--------------------------------------------------------------------
     alumno_form = AlumnoForm()
     grado_form = GradoForm(initial=valor_inicial)
@@ -108,11 +108,21 @@ def editar_alumno(request,alumno_public_id):
                }
     return render(request, "alumno.html", context)
 
-def lista(request,grado_public_id):
-    #alumnos = Alumno.objects.filter(discapacidad='SI').order_by('nombre')
-    #evaluacion = EvaluacionFluidezLectora.objects.filter(asistencia='AUSENTE')
-    #grado= Grado.objects.filter(cueanexo=cueanexo).first()
-    grado_public=grado_public_id
+def lista(request,seccion_id, eleccion):
+    #-------------------
+    print(seccion_id)
+    seccion=Seccion.objects.get(id=seccion_id, turno=eleccion)
+    print(seccion.grado_id)
+    instancia_grado=Grado.objects.get(id=seccion.grado_id)
+    #----------------------------------
+    # consulta=Alumno.objects.filter(
+    #     grado__
+    #     seccion__
+
+
+    # )
+    #---------------------
+    grado_public=instancia_grado.public_id
     grado=Grado.objects.get(public_id=grado_public)
     alumnos = Alumno.objects.filter(grado_id=grado.id).order_by('nombre')
     evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
@@ -122,53 +132,113 @@ def lista(request,grado_public_id):
     }
     return render(request,"lista.html", contexto)#,{"alumnos":alumnos, "query":alumno})
 #-----------grado y secciom-------------------------------------
+@login_required
 def grado(request):
-    #def grado(request, cueanexo):
-    cueanexo=1
-    #alumnos = Alumno.objects.filter(discapacidad='SI').order_by('nombre')
-    #evaluacion = EvaluacionFluidezLectora.objects.filter(asistencia='AUSENTE')
+    usuario= request.user
+    if usuario.is_authenticated:
+        nombre_usuario_cueanexo=usuario.username
+        cueanexo=nombre_usuario_cueanexo
     instancia_grado= Grado.objects.filter(cueanexo=cueanexo)
-    opciones_grado = [('', '-- Elige una Grado --')]
+
+    #print(cueanexo)
+    opciones_grado = [('', '-- Elige un Grado --')]
+    #print(instancia_grado.get('nombre_grado'))
     for grado in instancia_grado:
         opciones_grado.append((grado.id, grado.nombre_grado))
-        
+    #print(opciones_grado['nombre_grado'])
     # 3. Inicializar el formulario
-    form = SeccionViewForm()
+    grado_form_data = GradoViewForm()
     
     # 4. Asignar las opciones al campo 'seccion'
-    form.fields['seccion'].choices = opciones_grado
+    #grado_form.fields['grado'].choices = opciones_grado
+    if request.method == 'POST':
+        grado_form_data = GradoViewForm(request.POST)
+        grado_form_data.fields['grado'].choices = opciones_grado
+        if grado_form_data.is_valid():
+            with transaction.atomic():
+                grado_id=grado_form_data.cleaned_data["grado"]
+                grado=instancia_grado.get(cueanexo=cueanexo,id=grado_id)
+                grado_public=grado.public_id
+                return redirect("secciones", grado_public_id=grado_public)
+    else:
+        grado_form_data.fields['grado'].choices = opciones_grado
     contexto = {
-        'form': form
+        'grado_form_data': grado_form_data
     }
-    return render(request,"grados.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+    return render(request,"grados.html", contexto)
 
-def seccion(request):
-    
-    #traer secciones que ya existen 
-    #instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    instancia_seccion=Seccion.objects.filter(grado_id=1)
+def seccion(request, grado_public_id):
+    instancia_grado=Grado.objects.get(public_id=grado_public_id)
+    instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
     opciones_seccion = [('', '-- Elige una Sección --')] # El empty_label va primero
     
     # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
     for seccion in instancia_seccion:
-        opciones_seccion.append((seccion.grado_id, seccion.seccion))
+        opciones_seccion.append((seccion.id, seccion.seccion))
         
     # 3. Inicializar el formulario
     form = SeccionViewForm()
+    if request.method == 'POST':
+        form = SeccionViewForm(request.POST)
+        form.fields['seccion'].choices = opciones_seccion
+        if form.is_valid():
+            with transaction.atomic():
+                seccion_id=form.cleaned_data["seccion"]
+                seccion=instancia_seccion.get(id=seccion_id)
+                return redirect("turnos", seccion_id=seccion.id)
+    else:
+        form.fields['seccion'].choices = opciones_seccion
     
-    # 4. Asignar las opciones al campo 'seccion'
-    form.fields['seccion'].choices = opciones_seccion
+    # # 4. Asignar las opciones al campo 'seccion'
+    # form.fields['seccion'].choices = opciones_seccion
     contexto = {
         'form': form
     }
     return render(request,"secciones.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+
+
+
+def turno(request, seccion_id):
+    # instancia_grado=Grado.objects.get(public_id=grado_public_id)
+    instancia_seccion=Seccion.objects.filter(id=seccion_id)
+    opciones_turno = [('', '-- Elige un Turno --')] # El empty_label va primero
+    
+    # # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
+    for seccion in instancia_seccion:
+         opciones_turno.append((seccion.id, seccion.turno))
+        
+    # # 3. Inicializar el formulario
+    form = TurnoViewForm()
+    if request.method == 'POST':
+        form = TurnoViewForm(request.POST)
+        form.fields['turno'].choices = opciones_turno
+        if form.is_valid():
+            with transaction.atomic():
+                seccion_id=form.cleaned_data["turno"]
+                int_seccion_id=int(seccion_id)
+                # print(type(seccion_id))
+                # print(opciones_turno)
+                eleccion= [v for k,v in opciones_turno if k == int_seccion_id][0]
+                print(eleccion)
+                print('------')
+                seccion=instancia_seccion.get(id=seccion_id)
+                print(seccion.grado_id)
+                instancia_grado=Grado.objects.get(id=seccion.grado_id)
+                return redirect("lista", seccion_id=seccion.id, turno=eleccion)
+    else:
+        form.fields['turno'].choices = opciones_turno
+    
+    contexto = {
+        'form': form
+    }
+    return render(request,"turnos.html", contexto)#,{"alumnos":alumnos, "query":alumno})
 #---------------------------------------------------------
     
 
 def carga_evaluacion(request, alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
     instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    id_grado=instancia_grado.id
+    grado_public=instancia_grado.public_id
     if request.method == 'POST':
         form = EvaluacionFluidezForm(request.POST)
         if form.is_valid():
@@ -176,7 +246,7 @@ def carga_evaluacion(request, alumno_public_id):
             evaluacion.alumno =alumno_id
             evaluacion.asistencia='PRESENTE'
             evaluacion.save()
-            return redirect("lista", Grado=id_grado)
+            return redirect("lista", grado_public_id=grado_public)
     else:
         #Instancia vacia para metodo get
         form = EvaluacionFluidezForm()
