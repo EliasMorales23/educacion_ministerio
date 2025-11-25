@@ -3,7 +3,7 @@ from evaluaciones_educativas.models import *
 
 
 class GradoViewForm(forms.Form):
-	grado= forms.ChoiceField(label='grados', required=False)
+	grado= forms.ChoiceField(label='SELECCIONE UN GRADO', required=False)
 
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)
@@ -39,7 +39,14 @@ class AlumnoForm(forms.ModelForm):
 		#label para cambiar nombre de campo
 
 class AsistenciaForm(forms.Form):
-	asistencia= forms.BooleanField(label='asistencia', required=False)
+	asistencia= forms.BooleanField(label='ASISTENCIA', required=False,
+        widget=forms.RadioSelect(
+            choices=[
+                (True,'✅ ASISTIO'), 
+                (False, '❌ NO ASISTIO ')
+            ]
+        )
+    )
 
 class EvaluacionFluidezForm(forms.ModelForm):
 	class Meta:
@@ -62,6 +69,11 @@ class GradoForm(forms.ModelForm):
 					'readonly':'readonly'
 				}
 			),
+			'nombre_grado': forms.TextInput(
+				attrs={
+					'readonly':'readonly'
+				}
+			),
 			}
 	#solucion para evitar no seleccionar un unique desde el form	
 
@@ -70,3 +82,14 @@ class SeccionForm(forms.ModelForm):
 	class Meta:
 		model = Seccion
 		fields=['seccion','turno']
+		
+	
+class BorrarRegistroAlumnoForm(forms.Form):
+		borrar= forms.BooleanField(label='borrar',required=False,
+        widget=forms.RadioSelect(
+            choices=[
+                (True,'Eliminar registro'), 
+                (False, 'NO eliminar registro ')
+            ]
+        )
+    )
