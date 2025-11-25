@@ -25,11 +25,12 @@ SECRET_KEY = 'django-insecure-&6^kli45!=0kz%*1q%@rv7@skf8_vmjnwf3^!7fyluf!$r=4h+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','headlines-licensed-sociology-bee.trycloudflare.com']
 CSRF_TRUSTED_ORIGINS = [
     # Puedes añadir otros orígenes de confianza aquí:
-    # 'http://127.0.0.1:8000', 
-    # 'https://tu-dominio-produccion.com',
+    # 'http://127.0.0.1:8000',
+    'https://headlines-licensed-sociology-bee.trycloudflare.com',
+    'https://headlines-licensed-sociology-bee.trycloudflare.com/',
 ]
 # Application definition
 

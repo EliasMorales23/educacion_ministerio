@@ -67,7 +67,7 @@ def carga_alumno(request):
 @login_required
 def editar_alumno(request,alumno_public_id):
     instancia_alumno=get_object_or_404(Alumno,public_id=alumno_public_id)
-    instancia_seccion=get_object_or_404(Seccion,id=instancia_alumno.id)
+    instancia_seccion=get_object_or_404(Seccion,id=instancia_alumno.seccion_id)
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     alumno_form = AlumnoForm(instance=instancia_alumno)
     seccion_form = SeccionForm(instance=instancia_seccion)
@@ -126,6 +126,7 @@ def lista(request,seccion_public_id, turno):
     contexto = {
         'lista_alumnos': alumnos,
         'evaluciones': evaluacion,
+        'seccion': seccion
     }
     return render(request,"lista.html", contexto)#,{"alumnos":alumnos, "query":alumno})
 #-----------grado y secciom-------------------------------------
@@ -165,31 +166,40 @@ def seccion(request, grado_public_id):
     instancia_grado=get_object_or_404(Grado,public_id=grado_public_id)
     instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
     opciones_seccion = [('', '-- Elige una Sección --')] # El empty_label va primero
-    opciones_turno = [('', '-- Elige un turno --')]
+    #opciones_turno = [('', '-- Elige un turno --')]
     # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
     for seccion in instancia_seccion:
-        opciones_seccion.append((seccion.id, seccion.seccion))
-        opciones_turno.append((seccion.id, seccion.turno))
+        seccion_turno=f'Seccion:{seccion.seccion},Turno:{seccion.turno}'
+        opciones_seccion.append((seccion.id, seccion_turno))
+        #opciones_turno.append((seccion.id, seccion.turno))
     # 3. Inicializar el formulario
     seccion_view_form = SeccionViewForm()
-    turno_view_form = TurnoViewForm()
+    # turno_view_form = TurnoViewForm()
     if request.method == 'POST':
         seccion_view_form = SeccionViewForm(request.POST)
         seccion_view_form.fields['seccion'].choices = opciones_seccion
-        turno_view_form = TurnoViewForm(request.POST)
-        turno_view_form.fields['turno'].choices = opciones_turno
-        if seccion_view_form.is_valid() and turno_view_form.is_valid():
+        #turno_view_form = TurnoViewForm(request.POST)
+        # turno_view_form.fields['turno'].choices = opciones_turno
+        # print(opciones_seccion)
+        # print('-'*50)
+        # print(opciones_turno)
+        if seccion_view_form.is_valid():
             with transaction.atomic():
                 seccion_id=seccion_view_form.cleaned_data["seccion"]
-                turno=seccion_view_form.cleaned_data["turno"]
-                seccion=get_object_or_404(Seccion,id=seccion_id, turno=turno)
-                return redirect("lista", seccion_public_id=seccion_id.public_id, turno=turno)
+                # print(seccion_id)
+                # print('antes del for')
+                # for i in seccion_id:
+                #     print('aca')
+                #     print(i)
+
+                seccion=get_object_or_404(Seccion,id=seccion_id)
+                return redirect("lista", seccion_public_id=seccion.public_id, turno=seccion.turno)
     else:
         seccion_view_form.fields['seccion'].choices = opciones_seccion
-        turno_view_form.fields['turno'].choices = opciones_turno
+        #turno_view_form.fields['turno'].choices = opciones_turno
     contexto = {
         'seccion_view_form': seccion_view_form,
-        'turno_view_form':turno_view_form
+        # 'turno_view_form':turno_view_form
     }
     return render(request,"secciones.html", contexto)#,{"alumnos":alumnos, "query":alumno})
 
@@ -285,7 +295,7 @@ def asistencia(request,alumno_public_id):
     #SI instanciamos aca se crea antes de que confirme asistencia (puede ser conveniente)...
     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
         alumno_id=alumno_id.id)
-    instancia_seccion=Seccion.objects.get(id=alumno_id.grado_id)
+    instancia_seccion=Seccion.objects.get(id=alumno_id.seccion_id)
     seccion_public=instancia_seccion.public_id
     turno_seccion=instancia_seccion.turno
     #instancia_grado=Grado.objects.get(id=alumno_id.grado_id)

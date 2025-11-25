@@ -8,8 +8,8 @@ class GradoViewForm(forms.Form):
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)
 	
-# class TurnoViewForm(forms.Form):
-# 	turno= forms.ChoiceField(label='Turnos', required=False)
+class TurnoViewForm(forms.Form):
+	turno= forms.ChoiceField(label='Turnos', required=False)
 
 class AlumnoForm(forms.ModelForm):
 
@@ -28,12 +28,12 @@ class AlumnoForm(forms.ModelForm):
 			'nombre': forms.TextInput(attrs={
                 'required': 'true', 
                 'placeholder': 'NOMBRE DEL ALUMNO EN MAYUSCULA',
-				'pattern': '[A-Z]*'
+				'pattern': '[A-ZÑÁÉÍÓÚ ]*'
 			}),
 			'apellido': forms.TextInput(attrs={
                 'required': 'true', 
                 'placeholder': 'APELLIDO DEL ALUMNO EN MAYUSCULA',
-				'pattern': '[A-Z]*'
+				'pattern': '[A-ZÑÁÉÍÓÚ ]*'
 			})
 			}
 		#label para cambiar nombre de campo
@@ -56,9 +56,13 @@ class GradoForm(forms.ModelForm):
 		model = Grado
 		fields=['nombre_grado','cueanexo']
 		#ocultamos cueanexo
-		# widgets = {
-		# 	'cueanexo': forms.HiddenInput(),
-		# 	}
+		widgets = {
+			'cueanexo': forms.NumberInput(
+				attrs={
+					'readonly':'readonly'
+				}
+			),
+			}
 	#solucion para evitar no seleccionar un unique desde el form	
 
 
