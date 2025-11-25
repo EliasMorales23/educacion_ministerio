@@ -13,14 +13,9 @@ class Grado(models.Model):
     # ('SEXTO', '6to Grado'),
     # ('SEPTIMO', '7mo Grado'),
     ]
-    # OPCIONES_TURNO = [
-    # ('MANANA', 'Mañana'),
-    # ('TARDE', 'Tarde'),
-    # ]
     public_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
     cueanexo = models.IntegerField()#REPRESENTA A ESCUELA
     nombre_grado = models.CharField(max_length=8, choices= OPCIONES_GRADO, default='SEGUNDO')
-    #turno = models.CharField(max_length=6, choices=OPCIONES_TURNO, default='MANANA' )
     class Meta:
        #managed = False
         db_table = 'grados' 
@@ -47,9 +42,10 @@ class Seccion(models.Model):
     ('MANANA', 'Mañana'),
     ('TARDE', 'Tarde'),
     ]
+    public_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
     seccion = models.CharField(max_length=5, choices=OPCIONES_SECCION, default='UNICO')
-    grado = models.ForeignKey(Grado, on_delete=models.CASCADE)
     turno = models.CharField(max_length=6, choices=OPCIONES_TURNO, default='MANANA' )
+    grado = models.ForeignKey(Grado, on_delete=models.CASCADE)
     class Meta:
         #managed = False
         db_table = 'secciones'
@@ -71,16 +67,16 @@ class Alumno(models.Model):
     ('NO', 'No aplica'),
 ]
     public_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
-    dni = models.CharField(max_length=9,unique=True,null=True,blank=True)
+    dni = models.CharField(max_length=8,unique=True,null=True,blank=True)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
-    #cueanexo = models.IntegerField() # Consumiriamos de tabla cuanexo de escuela
     comunidad_indigena=models.CharField(max_length=11, choices= OPCIONES_COMUNIDAD_INDIGENA, default='NINGUNA')
     discapacidad = models.CharField(choices=OPCIONES_DISCAPACIDAD, default='NO')
-    grado = models.ForeignKey(Grado, on_delete=models.CASCADE)
+    seccion = models.ForeignKey(Seccion, on_delete=models.CASCADE)
     class Meta:
         #managed = False
         db_table = 'alumnos'
+        # unique_together = ('dni','seccion')
     def __str__(self):
         alumno_nombre=f'Alumno:{self.nombre} DNI:{self.dni}'
         return alumno_nombre

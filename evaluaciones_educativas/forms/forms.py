@@ -8,8 +8,8 @@ class GradoViewForm(forms.Form):
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)
 	
-class TurnoViewForm(forms.Form):
-	turno= forms.ChoiceField(label='Turnos', required=False)
+# class TurnoViewForm(forms.Form):
+# 	turno= forms.ChoiceField(label='Turnos', required=False)
 
 class AlumnoForm(forms.ModelForm):
 
@@ -22,17 +22,17 @@ class AlumnoForm(forms.ModelForm):
                 'required': 'true',         
                 'minlength': '8',
 				'maxlength':'8',
-                'placeholder': 'Ingresa el dni del alumno',
+                'placeholder': 'INGRESA EL DNI DEL ALUMNO',
 				'pattern': '[0-9]*'
             }),
 			'nombre': forms.TextInput(attrs={
                 'required': 'true', 
-                'placeholder': 'Ingresa el Nombre del alumno',
+                'placeholder': 'NOMBRE DEL ALUMNO EN MAYUSCULA',
 				'pattern': '[A-Z]*'
 			}),
 			'apellido': forms.TextInput(attrs={
                 'required': 'true', 
-                'placeholder': 'Ingresa el Apellido del alumno',
+                'placeholder': 'APELLIDO DEL ALUMNO EN MAYUSCULA',
 				'pattern': '[A-Z]*'
 			})
 			}
@@ -48,7 +48,7 @@ class EvaluacionFluidezForm(forms.ModelForm):
 		widgets = {
 			'cantidad_palabras_leidas': forms.NumberInput(attrs={
 			'min':'0',
-			'placeholder':'Ingrese la cantidad de palabras leidas'
+			'placeholder':'INGRESA LA CANTIDAD DE PALABRAS LEIDAS'
 			})}
 
 class GradoForm(forms.ModelForm):

@@ -53,7 +53,7 @@ def carga_alumno(request):
                 )
                 
                 alumno = alumno_form.save(commit=False)
-                alumno.grado = instancia_grado
+                alumno.seccion = instancia_seccion
                 alumno.save()
             return redirect("asistencia", alumno_public_id=alumno.public_id)
             
@@ -64,41 +64,36 @@ def carga_alumno(request):
                }
     return render(request, "alumno.html", context)
 
+@login_required
 def editar_alumno(request,alumno_public_id):
-    instancia_alumno=Alumno.objects.get(public_id=alumno_public_id)
-    instancia_grado=Grado.objects.get(id=instancia_alumno.grado_id)
-    instancia_seccion=Seccion.objects.get(grado_id=instancia_grado.id)
+    instancia_alumno=get_object_or_404(Alumno,public_id=alumno_public_id)
+    instancia_seccion=get_object_or_404(Seccion,id=instancia_alumno.id)
+    instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     alumno_form = AlumnoForm(instance=instancia_alumno)
-    grado_form = GradoForm(instance=instancia_grado)
     seccion_form = SeccionForm(instance=instancia_seccion)
+    grado_form = GradoForm(instance=instancia_grado)
     if request.method == 'POST':
         alumno_form = AlumnoForm(request.POST, instance=instancia_alumno)
         grado_form = GradoForm(request.POST, instance=instancia_grado)
         seccion_form = SeccionForm(request.POST, instance=instancia_seccion)
         if alumno_form.is_valid() and grado_form.is_valid() and seccion_form.is_valid():
-            nombre_grado=grado_form.cleaned_data["nombre_grado"]
-            #turno_grado=grado_form.cleaned_data["turno"]
-            cueanexo_grado=grado_form.cleaned_data["cueanexo"]
-            instancia_grado, creado_grado=Grado.objects.get_or_create(
-                nombre_grado=nombre_grado,
-                cueanexo=cueanexo_grado
+            with transaction.atomic():
+                nombre_grado=grado_form.cleaned_data["nombre_grado"]
+                cueanexo_grado=grado_form.cleaned_data["cueanexo"]
+                instancia_grado, creado_grado=Grado.objects.get_or_create(
+                    nombre_grado=nombre_grado,
+                    cueanexo=cueanexo_grado
+                    )
+                turno_seccion=seccion_form.cleaned_data["turno"]
+                nombre_seccion=seccion_form.cleaned_data["seccion"]
+                instancia_seccion, creado_seccion = Seccion.objects.get_or_create(
+                seccion=nombre_seccion,
+                turno=turno_seccion,
+                grado=instancia_grado
                 )
-            
-            turno_seccion=seccion_form.cleaned_data["turno"]
-            nombre_seccion=seccion_form.cleaned_data["seccion"]
-            instancia_seccion, creado_seccion = Seccion.objects.get_or_create(
-            seccion=nombre_seccion,
-            turno=turno_seccion,
-            grado=instancia_grado
-            )
-            # grado=grado_form.save()
-            # seccion=seccion_form.save(commit=False)
-            # seccion.grado=grado
-            # seccion.save()
-            #grado=grado_form.save()
-            alumno = alumno_form.save(commit=False)
-            alumno.grado = instancia_grado
-            alumno.save()
+                alumno = alumno_form.save(commit=False)
+                alumno.seccion = instancia_seccion
+                alumno.save()
             #alumno= alumno_form.save()
             return redirect("editar_asistencia", alumno_public_id=alumno.public_id)
     context = {
@@ -108,12 +103,14 @@ def editar_alumno(request,alumno_public_id):
                }
     return render(request, "alumno.html", context)
 
-def lista(request,seccion_id, eleccion):
+@login_required
+def lista(request,seccion_public_id, turno):
+    #seccion_public_id=seccion_public
     #-------------------
-    print(seccion_id)
-    seccion=Seccion.objects.get(id=seccion_id, turno=eleccion)
-    print(seccion.grado_id)
-    instancia_grado=Grado.objects.get(id=seccion.grado_id)
+    print(seccion_public_id)
+    seccion=get_object_or_404(Seccion,public_id=seccion_public_id, turno=turno)
+    # print(seccion.grado_id)
+    #instancia_grado=Grado.objects.get(id=seccion.grado_id)
     #----------------------------------
     # consulta=Alumno.objects.filter(
     #     grado__
@@ -122,9 +119,9 @@ def lista(request,seccion_id, eleccion):
 
     # )
     #---------------------
-    grado_public=instancia_grado.public_id
-    grado=Grado.objects.get(public_id=grado_public)
-    alumnos = Alumno.objects.filter(grado_id=grado.id).order_by('nombre')
+    # grado_public=instancia_grado.public_id
+    # grado=Grado.objects.get(public_id=grado_public)
+    alumnos = Alumno.objects.filter(seccion_id=seccion.id).order_by('nombre')
     evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
     contexto = {
         'lista_alumnos': alumnos,
@@ -138,19 +135,15 @@ def grado(request):
     if usuario.is_authenticated:
         nombre_usuario_cueanexo=usuario.username
         cueanexo=nombre_usuario_cueanexo
-    instancia_grado= Grado.objects.filter(cueanexo=cueanexo)
 
-    #print(cueanexo)
+    instancia_grado= Grado.objects.filter(cueanexo=cueanexo)
     opciones_grado = [('', '-- Elige un Grado --')]
-    #print(instancia_grado.get('nombre_grado'))
+    #CREAR OPCION DE MOSTRAR QUE NO HAY GRADOS CARGADOS
+
     for grado in instancia_grado:
         opciones_grado.append((grado.id, grado.nombre_grado))
-    #print(opciones_grado['nombre_grado'])
-    # 3. Inicializar el formulario
+
     grado_form_data = GradoViewForm()
-    
-    # 4. Asignar las opciones al campo 'seccion'
-    #grado_form.fields['grado'].choices = opciones_grado
     if request.method == 'POST':
         grado_form_data = GradoViewForm(request.POST)
         grado_form_data.fields['grado'].choices = opciones_grado
@@ -167,86 +160,94 @@ def grado(request):
     }
     return render(request,"grados.html", contexto)
 
+@login_required
 def seccion(request, grado_public_id):
-    instancia_grado=Grado.objects.get(public_id=grado_public_id)
+    instancia_grado=get_object_or_404(Grado,public_id=grado_public_id)
     instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
     opciones_seccion = [('', '-- Elige una Sección --')] # El empty_label va primero
-    
+    opciones_turno = [('', '-- Elige un turno --')]
     # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
     for seccion in instancia_seccion:
         opciones_seccion.append((seccion.id, seccion.seccion))
-        
+        opciones_turno.append((seccion.id, seccion.turno))
     # 3. Inicializar el formulario
-    form = SeccionViewForm()
+    seccion_view_form = SeccionViewForm()
+    turno_view_form = TurnoViewForm()
     if request.method == 'POST':
-        form = SeccionViewForm(request.POST)
-        form.fields['seccion'].choices = opciones_seccion
-        if form.is_valid():
+        seccion_view_form = SeccionViewForm(request.POST)
+        seccion_view_form.fields['seccion'].choices = opciones_seccion
+        turno_view_form = TurnoViewForm(request.POST)
+        turno_view_form.fields['turno'].choices = opciones_turno
+        if seccion_view_form.is_valid() and turno_view_form.is_valid():
             with transaction.atomic():
-                seccion_id=form.cleaned_data["seccion"]
-                seccion=instancia_seccion.get(id=seccion_id)
-                return redirect("turnos", seccion_id=seccion.id)
+                seccion_id=seccion_view_form.cleaned_data["seccion"]
+                turno=seccion_view_form.cleaned_data["turno"]
+                seccion=get_object_or_404(Seccion,id=seccion_id, turno=turno)
+                return redirect("lista", seccion_public_id=seccion_id.public_id, turno=turno)
     else:
-        form.fields['seccion'].choices = opciones_seccion
-    
-    # # 4. Asignar las opciones al campo 'seccion'
-    # form.fields['seccion'].choices = opciones_seccion
+        seccion_view_form.fields['seccion'].choices = opciones_seccion
+        turno_view_form.fields['turno'].choices = opciones_turno
     contexto = {
-        'form': form
+        'seccion_view_form': seccion_view_form,
+        'turno_view_form':turno_view_form
     }
     return render(request,"secciones.html", contexto)#,{"alumnos":alumnos, "query":alumno})
 
 
 
-def turno(request, seccion_id):
-    # instancia_grado=Grado.objects.get(public_id=grado_public_id)
-    instancia_seccion=Seccion.objects.filter(id=seccion_id)
-    opciones_turno = [('', '-- Elige un Turno --')] # El empty_label va primero
+# def turno(request, seccion_id):
+#     # instancia_grado=Grado.objects.get(public_id=grado_public_id)
+#     instancia_seccion=Seccion.objects.filter(id=seccion_id)
+#     opciones_turno = [('', '-- Elige un Turno --')] # El empty_label va primero
     
-    # # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
-    for seccion in instancia_seccion:
-         opciones_turno.append((seccion.id, seccion.turno))
+#     # # Suponiendo que tu modelo Seccion tiene 'id' y 'nombre'
+#     for seccion in instancia_seccion:
+#          opciones_turno.append((seccion.id, seccion.turno))
         
-    # # 3. Inicializar el formulario
-    form = TurnoViewForm()
-    if request.method == 'POST':
-        form = TurnoViewForm(request.POST)
-        form.fields['turno'].choices = opciones_turno
-        if form.is_valid():
-            with transaction.atomic():
-                seccion_id=form.cleaned_data["turno"]
-                int_seccion_id=int(seccion_id)
-                # print(type(seccion_id))
-                # print(opciones_turno)
-                eleccion= [v for k,v in opciones_turno if k == int_seccion_id][0]
-                print(eleccion)
-                print('------')
-                seccion=instancia_seccion.get(id=seccion_id)
-                print(seccion.grado_id)
-                instancia_grado=Grado.objects.get(id=seccion.grado_id)
-                return redirect("lista", seccion_id=seccion.id, turno=eleccion)
-    else:
-        form.fields['turno'].choices = opciones_turno
+#     # # 3. Inicializar el formulario
+#     form = TurnoViewForm()
+#     if request.method == 'POST':
+#         form = TurnoViewForm(request.POST)
+#         form.fields['turno'].choices = opciones_turno
+#         if form.is_valid():
+#             with transaction.atomic():
+#                 seccion_id=form.cleaned_data["turno"]
+#                 int_seccion_id=int(seccion_id)
+#                 # print(type(seccion_id))
+#                 # print(opciones_turno)
+#                 eleccion= [v for k,v in opciones_turno if k == int_seccion_id][0]
+#                 print(eleccion)
+#                 print('------')
+#                 seccion=instancia_seccion.get(id=seccion_id)
+#                 print(seccion.grado_id)
+#                 instancia_grado=Grado.objects.get(id=seccion.grado_id)
+#                 return redirect("lista", seccion_id=seccion.id, turno=eleccion)
+#     else:
+#         form.fields['turno'].choices = opciones_turno
     
-    contexto = {
-        'form': form
-    }
-    return render(request,"turnos.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+#     contexto = {
+#         'form': form
+#     }
+#     return render(request,"turnos.html", contexto)#,{"alumnos":alumnos, "query":alumno})
 #---------------------------------------------------------
     
-
+@login_required
 def carga_evaluacion(request, alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
-    instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    grado_public=instancia_grado.public_id
+    instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
+    seccion_public=instancia_seccion.public_id
+    turno_seccion=instancia_seccion.turno
+    # instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
+    # grado_public=instancia_grado.public_id
     if request.method == 'POST':
         form = EvaluacionFluidezForm(request.POST)
         if form.is_valid():
-            evaluacion = form.save(commit=False)
-            evaluacion.alumno =alumno_id
-            evaluacion.asistencia='PRESENTE'
-            evaluacion.save()
-            return redirect("lista", grado_public_id=grado_public)
+            with transaction.atomic():
+                evaluacion = form.save(commit=False)
+                evaluacion.alumno = alumno_id
+                evaluacion.asistencia ='PRESENTE'
+                evaluacion.save()
+            return redirect("lista", seccion_public_id=seccion_public, turno=turno_seccion)
     else:
         #Instancia vacia para metodo get
         form = EvaluacionFluidezForm()
@@ -255,35 +256,40 @@ def carga_evaluacion(request, alumno_public_id):
                'alumno':alumno_id}
     return render(request, "evaluacion.html", context)
 
-
+@login_required
 def editar_evaluacion(request, alumno_public_id):
-    alumno_id=Alumno.objects.get(public_id=alumno_public_id)
-    instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    #cueanexo=instancia_grado.cueanexo
-    grado_public=instancia_grado.public_id
+    alumno_id=get_object_or_404(Alumno,public_id=alumno_public_id)
+    instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
+    seccion_public=instancia_seccion.public_id
+    turno_seccion=instancia_seccion.turno
     instancia_evaluacion=EvaluacionFluidezLectora.objects.get(alumno_id=alumno_id.id)
     form=EvaluacionFluidezForm(instance=instancia_evaluacion)
     if request.method == 'POST':
         form=EvaluacionFluidezForm(request.POST,instance=instancia_evaluacion)
         if form.is_valid():
-            evaluacion=form.save(commit=False)
-            evaluacion.alumno_id = alumno_id
-            evaluacion.asistencia='PRESENTE'
-            evaluacion.save()
-            return redirect("lista", grado_public_id=grado_public)
-    context = {'form': form,
-               'alumno':alumno_id}
+            with transaction.atomic():
+                evaluacion=form.save(commit=False)
+                evaluacion.alumno_id = alumno_id
+                evaluacion.asistencia='PRESENTE'
+                evaluacion.save()
+            return redirect("lista", seccion_public_id=seccion_public, turno=turno_seccion)
+    context = {
+        'form': form,
+        'alumno':alumno_id
+        }
     return render(request, "evaluacion.html", context)
 
-
+@login_required
 def asistencia(request,alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
     #SI instanciamos aca se crea antes de que confirme asistencia (puede ser conveniente)...
     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
         alumno_id=alumno_id.id)
-    instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    # #cueanexo=instancia_grado.cueanexo
-    grado_public=instancia_grado.public_id
+    instancia_seccion=Seccion.objects.get(id=alumno_id.grado_id)
+    seccion_public=instancia_seccion.public_id
+    turno_seccion=instancia_seccion.turno
+    #instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
+    #grado_public=instancia_grado.public_id
     if request.method == 'POST':
         #----------LOGICA PARA EVALUACION (asistencia seleccionada)---------
     #     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
@@ -293,15 +299,15 @@ def asistencia(request,alumno_public_id):
     #     grado_public=instancia_grado.public_id
         #----------------------------------------
         form = AsistenciaForm(request.POST)
-        
         if form.is_valid():
-            asistencia= form.cleaned_data["asistencia"]
-            if asistencia: 
-                return redirect("carga_evaluacion", alumno_public_id=alumno_id.public_id)
-            else:
-                #llamamos a funcion ausentismo
-                ausentismo_evaluacion(instancia_evaluacion)
-                return redirect("lista",grado_public_id=grado_public)
+            with transaction.atomic():
+                asistencia= form.cleaned_data["asistencia"]
+                if asistencia: 
+                    return redirect("carga_evaluacion", alumno_public_id=alumno_id.public_id)
+                else:
+                    #llamamos a funcion ausentismo
+                    ausentismo_evaluacion(instancia_evaluacion)
+                    return redirect("lista",seccion_public_id=seccion_public, turno=turno_seccion)
     else:
         form = AsistenciaForm()
     context = {'form': form,
@@ -309,34 +315,31 @@ def asistencia(request,alumno_public_id):
                }
     return render(request,"asistencia.html",context)
 
+@login_required
 def editar_asistencia(request,alumno_public_id):
     #INSTANCIAS
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
-    instancia_grado=Grado.objects.get(id=alumno_id.grado_id)
-    #cueanexo=instancia_grado.cueanexo
-    grado_public=instancia_grado.public_id
-    #manejar error de que no tenga examen, esdecir si carga alumno pero no examen
-    #instancia_evaluacion=get_object_or_404(EvaluacionFluidezLectora,alumno_id=alumno_id.id)
-    instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(alumno_id=alumno_id.id)
+    instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
+    seccion_public=instancia_seccion.public_id
+    turno_seccion=instancia_seccion.turno
     if request.method == 'POST':
         asistencia_form = AsistenciaForm(request.POST)
         #Campos de tabla evaluacion
-        #evaluacion_campos=instancia_evaluacion._meta.fields
         if asistencia_form.is_valid():
-            asistencia= asistencia_form.cleaned_data["asistencia"]
-            #verificamos alumno presente
-            if asistencia: 
-                return redirect("editar_evaluacion", alumno_public_id=alumno_id.public_id)
-            else:
-                #funcion para asuntismo
-                
-                instancia_evaluacion=ausentismo_evaluacion(instancia_evaluacion)
-                instancia_evaluacion.save()
-                return redirect("lista",grado_public_id=grado_public)
+            with transaction.atomic():
+                asistencia = asistencia_form.cleaned_data["asistencia"]
+                #verificamos alumno presente
+                if asistencia: 
+                    return redirect("editar_evaluacion", alumno_public_id=alumno_id.public_id)
+                else:
+                    #Recien instanciamos en el ELSE 
+                    instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(alumno_id=alumno_id.id)
+                    evaluacion=ausentismo_evaluacion(instancia_evaluacion)
+                    evaluacion.save()
+                    return redirect("lista",seccion_public_id=seccion_public,turno=turno_seccion)
     else:
         asistencia_form = AsistenciaForm()
-    context = {'form': asistencia_form
-               }
+    context = {'form': asistencia_form}
     return render(request,"asistencia.html",context)
 
 
