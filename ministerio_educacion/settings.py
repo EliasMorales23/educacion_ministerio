@@ -25,12 +25,12 @@ SECRET_KEY = 'django-insecure-&6^kli45!=0kz%*1q%@rv7@skf8_vmjnwf3^!7fyluf!$r=4h+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','headlines-licensed-sociology-bee.trycloudflare.com']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','198.41.192.57','headlines-licensed-sociology-bee.trycloudflare.com','https://brooks-locator-prepaid-continental.trycloudflare.com']
 CSRF_TRUSTED_ORIGINS = [
     # Puedes añadir otros orígenes de confianza aquí:
     # 'http://127.0.0.1:8000',
     'https://headlines-licensed-sociology-bee.trycloudflare.com',
-    'https://headlines-licensed-sociology-bee.trycloudflare.com/',
+    'https://brooks-locator-prepaid-continental.trycloudflare.com',
 ]
 # Application definition
 
@@ -82,9 +82,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'bd_evaluacion': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db_evaluacion.sqlite3',
     }
     
 }
+DATABASE_ROUTERS = ['evaluaciones_educativas.routers.SecondaryDBRouter']
 
 
 # Password validation

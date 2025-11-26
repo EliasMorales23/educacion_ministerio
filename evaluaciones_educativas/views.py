@@ -155,13 +155,16 @@ def lista_grado(request,grado):
         nombre_usuario_cueanexo=name
 #-----logica para DNI+CUEANEXO---------
     cueanexo=int(nombre_usuario_cueanexo)
-    if grado =='SEGUNDO' or grado == 'TERCERO':
+    if grado =='SEGUNDO' or grado =='TERCERO':
+            
+        try:
+            instancia_grado=Grado.objects.get(cueanexo=cueanexo, nombre_grado=grado)
 
-        instancia_grado=get_object_or_404(Grado,cueanexo=cueanexo, nombre_grado=grado)
-    # instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
-    # #print(instancia_seccion)
-    # instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
-        return redirect("lista", grado_public_id=instancia_grado.public_id)
+        # instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
+        # #print(instancia_seccion)
+        # instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
+            return redirect("lista", grado_public_id=instancia_grado.public_id)
+        except Grado.DoesNotExist:
         #-------------------
         # seccion=get_object_or_404(Seccion,public_id=seccion_public_id)
         # instancia_seccion=Seccion.objects.filter(grado_id=seccion.grado_id)
@@ -178,7 +181,7 @@ def lista_grado(request,grado):
         #     #INSTANCIA GRADO FALTA COSNEGUIR DE CADA ALUMNO CADA GRADO
         # }
 
-    return render(request,"lista.html")
+            return render(request,"lista.html")
 #-----------grado y secciom-------------------------------------
 @login_required
 def grado(request):

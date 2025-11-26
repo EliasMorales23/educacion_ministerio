@@ -120,7 +120,7 @@
             <span>Examen Fluidez Segundo</span>
           </a>
         </li>
-
+        {% comment %} TRAER TODOS LOS CUEANEXOS QUE PARTICIPAN like '%Común - Primaria de 7 años%' {% endcomment %}
         <li class="nav-item">
           <a href="{% url 'lista_grado' grado='TERCERO'%}" class="nav-link">
             <i class="bi bi-book"></i>
@@ -240,9 +240,9 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
+          {% comment %} <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
             >Añadir Alumno</a
-          >
+          > {% endcomment %}
           <a href="{% url 'salir' %}" class="btn btn-danger btn-custom"
             >Cerrar Sesión</a
           >

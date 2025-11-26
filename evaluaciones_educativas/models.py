@@ -26,6 +26,7 @@ class Grado(models.Model):
 class Seccion(models.Model):
     OPCIONES_SECCION = [
 	('UNICO', 'Unico'),
+    ('UNICO', 'Multiple'),
     ('A', 'A'),
     ('B', 'B'),
     ('C', 'C'),
@@ -41,6 +42,7 @@ class Seccion(models.Model):
     OPCIONES_TURNO = [
     ('MANANA', 'Mañana'),
     ('TARDE', 'Tarde'),
+    ('DOBLE', 'Doble'),
     ]
     public_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
     seccion = models.CharField(max_length=5, choices=OPCIONES_SECCION, default='UNICO')

@@ -23,8 +23,11 @@
       }
 
       .container-custom {
-        max-width: 1400px;
+        /* Para usar el máximo espacio disponible en la pantalla */
+        width: 100%;
+        max-width: none;
         margin: auto;
+        padding: 0 15px;
       }
 
       .card {
@@ -43,6 +46,80 @@
       table {
         width: 100%;
       }
+
+      /* --- NUEVOS ESTILOS PARA FORZAR EL AJUSTE VERTICAL Y CONTROLAR ANCHOS --- */
+
+      /* 1. Definir un layout de tabla fijo para respetar los anchos */
+      .table-fixed {
+        table-layout: fixed;
+      }
+
+      /* 2. Permitir el salto de línea en todas las celdas */
+      .table-fixed th,
+      .table-fixed td {
+        white-space: normal; /* Permite que el texto salte de línea */
+        overflow-wrap: break-word; /* Asegura que las palabras largas se rompan */
+        word-break: break-word;
+        padding: 0.5rem 0.3rem; /* Reducimos un poco el padding estándar de Bootstrap */
+      }
+
+      /* 3. Definir anchos fijos para las columnas. La suma total de anchos debe ser <= 100% o el ancho del contenedor. */
+
+      /* Datos del Alumno (5 columnas) */
+      .table-fixed th:nth-child(1),
+      .table-fixed td:nth-child(1) {
+        width: 10%;
+      } /* Nombre */
+      .table-fixed th:nth-child(2),
+      .table-fixed td:nth-child(2) {
+        width: 10%;
+      } /* Apellido */
+      .table-fixed th:nth-child(3),
+      .table-fixed td:nth-child(3) {
+        width: 8%;
+      } /* DNI */
+      .table-fixed th:nth-child(4),
+      .table-fixed td:nth-child(4) {
+        width: 7%;
+      } /* Seccion */
+      .table-fixed th:nth-child(5),
+      .table-fixed td:nth-child(5) {
+        width: 7%;
+      } /* Turno */
+
+      /* Fluidez Lectora (8 columnas) */
+      .table-fixed th:nth-child(6),
+      .table-fixed td:nth-child(6) {
+        width: 7%;
+      } /* Asistencia */
+      .table-fixed th:nth-child(7),
+      .table-fixed td:nth-child(7) {
+        width: 8%;
+      } /* P. Leídas */
+
+      /* Preguntas P1 a P6 (6 columnas pequeñas) */
+      .table-fixed th:nth-child(n + 8):nth-child(-n + 13),
+      .table-fixed td:nth-child(n + 8):nth-child(-n + 13) {
+        width: 3.5%; /* Ancho muy reducido para una respuesta de un solo dígito/letra */
+        font-size: 0.85rem;
+      }
+
+      /* Acciones (1 columna) */
+      .table-fixed th:nth-child(14),
+      .table-fixed td:nth-child(14) {
+        width: 20%;
+        min-width: 140px; /* Asegura que haya espacio para los botones */
+      }
+
+      /* Ajuste de botones para caber en la celda de Acciones */
+      .d-inline-flex .btn-custom {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        display: inline-block;
+      }
+
+      /* --- FIN DE ESTILOS AGREGADOS --- */
 
       .btn-custom {
         border-radius: 10px;
@@ -73,7 +150,6 @@
       }
 
       #sidebar-wrapper:hover {
-        /* AUMENTADO A 280PX para acomodar el texto completo */
         width: 280px;
       }
 
@@ -100,7 +176,6 @@
       }
 
       #sidebar-wrapper:hover + #content-area {
-        /* Aumentado a 300px */
         margin-left: 300px;
       }
     </style>
@@ -140,10 +215,12 @@
 
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-striped table-hover align-middle">
+              <table
+                class="table table-striped table-hover align-middle table-fixed"
+              >
                 <thead class="table-dark">
                   <tr>
-                    <th colspan="4" class="text-center bg-alumno">
+                    <th colspan="5" class="text-center bg-alumno">
                       Datos del Alumno
                     </th>
                     <th colspan="9" class="text-center bg-comprension">
@@ -155,7 +232,8 @@
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>DNI</th>
-                    <th>Grado</th>
+                    <th>Seccion</th>
+                    <th>Turno</th>
                     <th>Asistencia</th>
                     <th>P. Leídas</th>
                     <th>P1</th>
@@ -164,7 +242,7 @@
                     <th>P4</th>
                     <th>P5</th>
                     <th>P6</th>
-                    <th class="text-center bg-alumno">Acciones</th>
+                    <th class="text-center bg-alumno">Accion</th>
                   </tr>
                 </thead>
 
@@ -174,8 +252,8 @@
                     <td><strong>{{ eval.alumno.nombre }}</strong></td>
                     <td>{{ eval.alumno.apellido }}</td>
                     <td>{{ eval.alumno.dni }}</td>
-                    <td>{{ eval.alumno.seccion.grado.nombre_grado }}</td>
-
+                    <td>{{ eval.alumno.seccion.seccion }}</td>
+                    <td>{{ eval.alumno.seccion.turno }}</td>
                     <td>{{ eval.asistencia }}</td>
                     <td>{{ eval.cantidad_palabras_leidas|default:'-' }}</td>
 
@@ -199,7 +277,9 @@
                     </td>
 
                     <td class="text-center">
-                      <div class="d-inline-flex flex-nowrap gap-1">
+                      <div
+                        class="d-inline-flex flex-wrap gap-1 justify-content-center"
+                      >
                         <a
                           href="{% url 'editar_alumno' alumno_public_id=eval.alumno.public_id %}"
                           class="btn btn-sm btn-outline-primary btn-custom"
