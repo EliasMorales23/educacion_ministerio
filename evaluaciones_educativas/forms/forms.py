@@ -2,14 +2,16 @@ from django import forms
 from evaluaciones_educativas.models import *
 
 
+
 class GradoViewForm(forms.Form):
 	grado= forms.ChoiceField(label='SELECCIONE UN GRADO', required=False)
 
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)
+
 	
-class TurnoViewForm(forms.Form):
-	turno= forms.ChoiceField(label='Turnos', required=False)
+# class TurnoViewForm(forms.Form):
+# 	turno= forms.ChoiceField(label='Turnos', required=False)
 
 class AlumnoForm(forms.ModelForm):
 

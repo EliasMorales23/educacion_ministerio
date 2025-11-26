@@ -71,6 +71,7 @@ def carga_alumno(request,grado_public_id):
         'alumno_form': alumno_form,
         'grado_form': grado_form,
         'seccion_form': seccion_form,
+        'grado_public':grado.public_id,
                }
     return render(request, "alumno.html", context)
 
@@ -110,19 +111,18 @@ def editar_alumno(request,alumno_public_id):
         'alumno_form': alumno_form,
          'grado_form': grado_form,
         'seccion_form': seccion_form,
+        'grado_public':instancia_grado.public_id,
                }
     return render(request, "alumno.html", context)
 
 @login_required
-#def lista(request,seccion_public_id, turno):
-#def lista(request,grado_public_id): 
-def lista(request): 
-    usuario= request.user
-    if usuario.is_authenticated:
-        nombre_usuario_cueanexo=usuario.username
+def lista(request,grado_public_id): 
+    # usuario= request.user
+    # if usuario.is_authenticated:
+    #     nombre_usuario_cueanexo=usuario.username
         #valor_inicial={'cueanexo': nombre_usuario_cueanexo}
-    instancia_grado=Grado.objects.filter(cueanexo=nombre_usuario_cueanexo)
-    instancia_seccion=Seccion.objects.filter(grado_id__in=instancia_grado)
+    instancia_grado=get_object_or_404(Grado,public_id=grado_public_id)
+    instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
     #print(instancia_seccion)
     #-------------------
     # seccion=get_object_or_404(Seccion,public_id=seccion_public_id)
@@ -136,11 +136,38 @@ def lista(request):
     contexto = {
         'lista_alumnos': alumnos,
         'evaluciones': evaluacion,
-        'seccion': instancia_seccion,
-        'grado':instancia_grado
+        'nombre_grado':instancia_grado.nombre_grado,
         #INSTANCIA GRADO FALTA COSNEGUIR DE CADA ALUMNO CADA GRADO
     }
     return render(request,"lista.html", contexto)#,{"alumnos":alumnos, "query":alumno})
+#-----------------lista para grados------------------
+@login_required
+def lista_grado(request,grado): 
+    usuario= request.user
+    if usuario.is_authenticated:
+        nombre_usuario_cueanexo=usuario.username
+        #valor_inicial={'cueanexo': nombre_usuario_cueanexo}
+    if grado =='SEGUNDO' or grado == 'TERCERO':
+        instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
+        instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
+        #print(instancia_seccion)
+        #-------------------
+        # seccion=get_object_or_404(Seccion,public_id=seccion_public_id)
+        # instancia_seccion=Seccion.objects.filter(grado_id=seccion.grado_id)
+        # grado=get_object_or_404(Grado,id=seccion.grado_id)
+
+        #----------------------------------
+        
+        alumnos = Alumno.objects.filter(seccion_id__in=instancia_seccion).order_by('nombre')
+        evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
+        contexto = {
+            'lista_alumnos': alumnos,
+            'evaluciones': evaluacion,
+             'nombre_grado':instancia_grado.nombre_grado,
+            #INSTANCIA GRADO FALTA COSNEGUIR DE CADA ALUMNO CADA GRADO
+        }
+
+    return render(request,"lista.html", contexto)
 #-----------grado y secciom-------------------------------------
 @login_required
 def grado(request):
@@ -278,7 +305,7 @@ def carga_evaluacion(request, alumno_public_id):
                 evaluacion.alumno = alumno_id
                 evaluacion.asistencia ='PRESENTE'
                 evaluacion.save()
-            return redirect("lista")
+            return redirect("lista", grado_public_id=grado_public)
     else:
         #Instancia vacia para metodo get
         form = EvaluacionFluidezForm()
@@ -303,7 +330,7 @@ def editar_evaluacion(request, alumno_public_id):
                 evaluacion.alumno_id = alumno_id
                 evaluacion.asistencia='PRESENTE'
                 evaluacion.save()
-            return redirect("lista")
+            return redirect("lista", grado_public_id=grado_public)
     context = {
         'form': form,
         'alumno':alumno_id
@@ -316,9 +343,9 @@ def asistencia(request,alumno_public_id):
     #SI instanciamos aca se crea antes de que confirme asistencia (puede ser conveniente)...
     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
         alumno_id=alumno_id.id)
-    # instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
-    # instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
-    # grado_public=instancia_grado.public_id
+    instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
+    instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
+    grado_public=instancia_grado.public_id
     if request.method == 'POST':
             form = AsistenciaForm(request.POST)
             if form.is_valid():
@@ -330,7 +357,7 @@ def asistencia(request,alumno_public_id):
                         #llamamos a funcion ausentismo
                         evaluacion=ausentismo_evaluacion(instancia_evaluacion)
                         evaluacion.save()
-                        return redirect("lista")
+                        return redirect("lista", grado_public_id=grado_public)
     else:
         form = AsistenciaForm()
     context = {'form': form,
@@ -359,7 +386,7 @@ def editar_asistencia(request,alumno_public_id):
                     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(alumno_id=alumno_id.id)
                     evaluacion=ausentismo_evaluacion(instancia_evaluacion)
                     evaluacion.save()
-                    return redirect("lista")
+                    return redirect("lista", grado_public_id=grado_public)
     else:
         asistencia_form = AsistenciaForm()
     context = {'form': asistencia_form}
@@ -379,9 +406,9 @@ def borrar_registro_alumno(request,alumno_public_id):
                 eleccion= form.cleaned_data["borrar"]
                 if eleccion:
                     alumno_id.delete()
-                    return redirect("lista")
+                    return redirect("lista", grado_public_id=grado_public)
                 else:
-                    return redirect("lista")
+                    return redirect("lista", grado_public_id=grado_public)
     else:
         form = BorrarRegistroAlumnoForm()
     context = {'form': form,

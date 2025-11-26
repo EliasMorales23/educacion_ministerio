@@ -40,10 +40,6 @@
         text-align: center;
       }
 
-      h1 {
-        font-weight: 600;
-      }
-
       table {
         width: 100%;
       }
@@ -53,116 +49,198 @@
         font-weight: 600;
       }
 
-      /* Estilos para encabezados de grupo */
+      /* Encabezados */
       .bg-alumno {
         background-color: #007bff !important;
-      }
-      .bg-lectura {
-        background-color: #17a2b8 !important;
       }
       .bg-comprension {
         background-color: #28a745 !important;
       }
-      .bg-otros {
-        background-color: #6c757d !important;
+
+      /* ------- SIDEBAR HOVER AJUSTADO -------- */
+      #sidebar-wrapper {
+        width: 70px;
+        transition: width 0.35s ease;
+        overflow: hidden;
+        background: #0a58ca;
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 1030;
+        padding-top: 20px;
       }
-      .bg-acciones {
-        background-color: #343a40 !important;
+
+      #sidebar-wrapper:hover {
+        /* AUMENTADO A 280PX para acomodar el texto completo */
+        width: 280px;
+      }
+
+      #sidebar-wrapper .nav-link {
+        color: white;
+        padding: 12px 16px;
+        white-space: nowrap;
+        transition: background 0.25s;
+      }
+
+      #sidebar-wrapper .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      #sidebar-wrapper i {
+        font-size: 1.3rem;
+        margin-right: 10px;
+      }
+
+      /* Para que el contenido no quede tapado */
+      #content-area {
+        margin-left: 90px;
+        transition: margin-left 0.35s ease;
+      }
+
+      #sidebar-wrapper:hover + #content-area {
+        /* Aumentado a 300px */
+        margin-left: 300px;
       }
     </style>
   </head>
 
   <body>
-    <div class="container container-custom">
-      <div class="card mb-4">
-        <div class="card-header">
-          <h1>Evaluación de Fluidez Lectora</h1>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-              <thead class="table-dark">
-                <tr>
-                  <th colspan="4" class="text-center bg-alumno">
-                    Datos del Alumno
-                  </th>
+    <div id="sidebar-wrapper">
+      <ul class="nav flex-column px-2">
+        <li class="nav-item">
+          <a href="https://visoreducativochaco.com.ar/" class="nav-link">
+            <i class="bi bi-house"></i> <span>Home</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'lista_grado' grado='SEGUNDO'%}" class="nav-link">
+            <i class="bi bi-book"></i>
+            <span>Examen Fluidez Segundo</span>
+          </a>
+        </li>
 
-                  <th colspan="8" class="text-center bg-comprension">
-                    Fluidez Lectora (Respuestas)
-                  </th>
-                  <th rowspan="1" class="text-center bg-acciones">Acciones</th>
-                </tr>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>DNI</th>
-                  <th>Grado</th>
-                  <th>Asistencia</th>
-                  <th>P. Leídas</th>
-                  <th>P1</th>
-                  <th>P2</th>
-                  <th>P3</th>
-                  <th>P4</th>
-                  <th>P5</th>
-                  <th>P6</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for eval in evaluciones %}
-                <tr>
-                  <td><strong>{{ eval.alumno.nombre }}</strong></td>
-                  <td>{{ eval.alumno.apellido }}</td>
-                  <td>{{ eval.alumno.dni }}</td>
-                  <td>{{ eval.alumno.seccion.grado.nombre_grado }}</td>
+        <li class="nav-item">
+          <a href="{% url 'lista_grado' grado='TERCERO'%}" class="nav-link">
+            <i class="bi bi-book"></i>
+            <span>Examen Fluidez Tercero</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-                  <td>{{ eval.asistencia }}</td>
-                  <td>{{ eval.cantidad_palabras_leidas|default:'-' }}</td>
+    <div id="content-area">
+      <div class="container container-custom">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h1>Evaluación de Fluidez Lectora</h1>
+            <h4>GRADO: {{nombre_grado}}</h4>
+          </div>
 
-                  <td class="text-center">{{ eval.pregunta_1|default:'-' }}</td>
-                  <td class="text-center">{{ eval.pregunta_2|default:'-' }}</td>
-                  <td class="text-center">{{ eval.pregunta_3|default:'-' }}</td>
-                  <td class="text-center">{{ eval.pregunta_4|default:'-' }}</td>
-                  <td class="text-center">{{ eval.pregunta_5|default:'-' }}</td>
-                  <td class="text-center">{{ eval.pregunta_6|default:'-' }}</td>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th colspan="4" class="text-center bg-alumno">
+                      Datos del Alumno
+                    </th>
+                    <th colspan="9" class="text-center bg-comprension">
+                      Fluidez Lectora (Respuestas)
+                    </th>
+                  </tr>
 
-                  <td class="text-center">
-                    <a
-                      href="{% url 'editar_alumno' alumno_public_id=eval.alumno.public_id %}"
-                      class="btn btn-sm btn-outline-primary btn-custom mb-1"
-                      title="Editar Datos del Alumno"
-                    >
-                      <i class="bi bi-person-fill"></i> Editar
-                    </a>
-                    <a
-                      href="{% url 'editar_evaluacion' alumno_public_id=eval.alumno.public_id %}"
-                      class="btn btn-sm btn-outline-success btn-custom mb-1"
-                      title="Editar Evaluación"
-                    >
-                      <i class="bi bi-journal-check"></i> Editar
-                    </a>
-                    <a
-                      href="{% url 'borrar_registro_alumno' alumno_public_id=eval.alumno.public_id %}"
-                      class="btn btn-sm btn-outline-danger btn-custom"
-                      title="Eliminar Registro Completo"
-                    >
-                      <i class="bi bi-x-circle-fill"></i> Borrar
-                    </a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Grado</th>
+                    <th>Asistencia</th>
+                    <th>P. Leídas</th>
+                    <th>P1</th>
+                    <th>P2</th>
+                    <th>P3</th>
+                    <th>P4</th>
+                    <th>P5</th>
+                    <th>P6</th>
+                    <th class="text-center bg-alumno">Acciones</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for eval in evaluciones %}
+                  <tr>
+                    <td><strong>{{ eval.alumno.nombre }}</strong></td>
+                    <td>{{ eval.alumno.apellido }}</td>
+                    <td>{{ eval.alumno.dni }}</td>
+                    <td>{{ eval.alumno.seccion.grado.nombre_grado }}</td>
+
+                    <td>{{ eval.asistencia }}</td>
+                    <td>{{ eval.cantidad_palabras_leidas|default:'-' }}</td>
+
+                    <td class="text-center">
+                      {{ eval.pregunta_1|default:'-' }}
+                    </td>
+                    <td class="text-center">
+                      {{ eval.pregunta_2|default:'-' }}
+                    </td>
+                    <td class="text-center">
+                      {{ eval.pregunta_3|default:'-' }}
+                    </td>
+                    <td class="text-center">
+                      {{ eval.pregunta_4|default:'-' }}
+                    </td>
+                    <td class="text-center">
+                      {{ eval.pregunta_5|default:'-' }}
+                    </td>
+                    <td class="text-center">
+                      {{ eval.pregunta_6|default:'-' }}
+                    </td>
+
+                    <td class="text-center">
+                      <div class="d-inline-flex flex-nowrap gap-1">
+                        <a
+                          href="{% url 'editar_alumno' alumno_public_id=eval.alumno.public_id %}"
+                          class="btn btn-sm btn-outline-primary btn-custom"
+                          title="Editar Datos del Alumno"
+                        >
+                          <i class="bi bi-person-fill"></i> Editar
+                        </a>
+
+                        <a
+                          href="{% url 'editar_evaluacion' alumno_public_id=eval.alumno.public_id %}"
+                          class="btn btn-sm btn-outline-success btn-custom"
+                          title="Editar Evaluación de Fluidez"
+                        >
+                          <i class="bi bi-journal-check"></i> Eval.
+                        </a>
+
+                        <a
+                          href="{% url 'borrar_registro_alumno' alumno_public_id=eval.alumno.public_id %}"
+                          class="btn btn-sm btn-outline-danger btn-custom"
+                          title="Borrar Registro del Alumno"
+                        >
+                          <i class="bi bi-x-circle-fill"></i> Borrar
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="d-flex justify-content-between">
-        <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
-          >Añadir Alumno</a
-        >
-        <a href="{% url 'salir' %}" class="btn btn-danger btn-custom"
-          >Cerrar Sesión</a
-        >
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
+            >Añadir Alumno</a
+          >
+          <a href="{% url 'salir' %}" class="btn btn-danger btn-custom"
+            >Cerrar Sesión</a
+          >
+        </div>
       </div>
     </div>
 
