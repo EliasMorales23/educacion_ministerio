@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista</title>
+    <title>MONITOREO</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -135,7 +135,6 @@
         <div class="card mb-4">
           <div class="card-header">
             <h1>Evaluación de Fluidez Lectora</h1>
-            <h4>GRADO: {{nombre_grado}}</h4>
           </div>
 
           <div class="card-body">
@@ -143,35 +142,41 @@
               <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                   <tr>
-                    <th colspan="4" class="text-center bg-alumno">
-                      Datos del Alumno
-                    </th>
-                    <th colspan="9" class="text-center bg-comprension">
-                      Fluidez Lectora (Respuestas)
-                    </th>
-                  </tr>
-
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>DNI</th>
-                    <th>Grado</th>
-                    <th>Asistencia</th>
-                    <th>P. Leídas</th>
-                    <th>P1</th>
-                    <th>P2</th>
-                    <th>P3</th>
-                    <th>P4</th>
-                    <th>P5</th>
-                    <th>P6</th>
-                    <th class="text-center bg-alumno">Acciones</th>
+                    <th>CUEANEXO</th>
+                    <th>GRADO</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th class="text-center bg-alumno">CARGA</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {% for eval in evaluciones %}
+                  {% for g in grados %}
                   <tr>
-                    <td><strong>{{ eval.alumno.nombre }}</strong></td>
+                    <td><strong>{{g.cueanexo}}</strong></td>
+                    <td><strong>{{g.nombre_grado}}</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-center">
+                    <div class="d-inline-flex flex-nowrap gap-1">
+                        {{ eval.pregunta_1|default:'SI' }}
+                    {% comment %}
                     <td>{{ eval.alumno.apellido }}</td>
                     <td>{{ eval.alumno.dni }}</td>
                     <td>{{ eval.alumno.seccion.grado.nombre_grado }}</td>
@@ -197,7 +202,7 @@
                     <td class="text-center">
                       {{ eval.pregunta_6|default:'-' }}
                     </td>
-
+                    {% endcomment %} {% comment %}
                     <td class="text-center">
                       <div class="d-inline-flex flex-nowrap gap-1">
                         <a
@@ -222,6 +227,7 @@
                           title="Borrar Registro del Alumno"
                         >
                           <i class="bi bi-x-circle-fill"></i> Borrar
+                          {%endcomment %}
                         </a>
                       </div>
                     </td>

@@ -59,6 +59,16 @@ class EvaluacionFluidezForm(forms.ModelForm):
 			'min':'0',
 			'placeholder':'INGRESA LA CANTIDAD DE PALABRAS LEIDAS'
 			})}
+		
+	def __init__(self, *args, max_cantidad_palabra=None, **kwargs):
+		super().__init__(*args, **kwargs)
+		if max_cantidad_palabra is not None:
+			# Establece el tope de validación en el nivel del formulario
+			self.fields['cantidad_palabras_leidas'].max_value = max_cantidad_palabra 
+			
+			# **Importante:** Establece el atributo HTML 'max' para el frontend
+			self.fields['cantidad_palabras_leidas'].widget.attrs['max'] = max_cantidad_palabra
+			self.fields['cantidad_palabras_leidas'].widget.attrs['placeholder'] = f'Máx. {max_cantidad_palabra}'
 
 class GradoForm(forms.ModelForm):
 	class Meta:

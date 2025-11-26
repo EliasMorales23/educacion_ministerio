@@ -71,7 +71,7 @@ def carga_alumno(request,grado_public_id):
         'alumno_form': alumno_form,
         'grado_form': grado_form,
         'seccion_form': seccion_form,
-        'grado_public':grado.public_id,
+        'grado_public':grado_public_id,
                }
     return render(request, "alumno.html", context)
 
@@ -143,14 +143,25 @@ def lista(request,grado_public_id):
 #-----------------lista para grados------------------
 @login_required
 def lista_grado(request,grado): 
+    #---------logica para obtener cueanexo por medio de username--------------
     usuario= request.user
     if usuario.is_authenticated:
-        nombre_usuario_cueanexo=usuario.username
-        #valor_inicial={'cueanexo': nombre_usuario_cueanexo}
+        name=usuario.username
+    #-----logica para DNI+CUEANEXO---------
+    if len(name)>9  and len(name)<=17:
+        #DNI+CUEANEXO
+        nombre_usuario_cueanexo=name[8:]
+    else:
+        nombre_usuario_cueanexo=name
+#-----logica para DNI+CUEANEXO---------
+    cueanexo=int(nombre_usuario_cueanexo)
     if grado =='SEGUNDO' or grado == 'TERCERO':
-        instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
-        instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
-        #print(instancia_seccion)
+
+        instancia_grado=get_object_or_404(Grado,cueanexo=cueanexo, nombre_grado=grado)
+    # instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
+    # #print(instancia_seccion)
+    # instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
+        return redirect("lista", grado_public_id=instancia_grado.public_id)
         #-------------------
         # seccion=get_object_or_404(Seccion,public_id=seccion_public_id)
         # instancia_seccion=Seccion.objects.filter(grado_id=seccion.grado_id)
@@ -158,16 +169,16 @@ def lista_grado(request,grado):
 
         #----------------------------------
         
-        alumnos = Alumno.objects.filter(seccion_id__in=instancia_seccion).order_by('nombre')
-        evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
-        contexto = {
-            'lista_alumnos': alumnos,
-            'evaluciones': evaluacion,
-             'nombre_grado':instancia_grado.nombre_grado,
-            #INSTANCIA GRADO FALTA COSNEGUIR DE CADA ALUMNO CADA GRADO
-        }
+        # alumnos = Alumno.objects.filter(seccion_id__in=instancia_seccion).order_by('nombre')
+        # evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
+        # contexto = {
+        #     'lista_alumnos': alumnos,
+        #     'evaluciones': evaluacion,
+        #      'nombre_grado':instancia_grado.nombre_grado,
+        #     #INSTANCIA GRADO FALTA COSNEGUIR DE CADA ALUMNO CADA GRADO
+        # }
 
-    return render(request,"lista.html", contexto)
+    return render(request,"lista.html")
 #-----------grado y secciom-------------------------------------
 @login_required
 def grado(request):
@@ -297,8 +308,13 @@ def carga_evaluacion(request, alumno_public_id):
     # turno_seccion=instancia_seccion.turno
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     grado_public=instancia_grado.public_id
+    # print(instancia_grado.nombre_grado)
+    if instancia_grado.nombre_grado =='SEGUNDO':
+        cantidad_palabra_maxima=170
+    else:
+        cantidad_palabra_maxima=211
     if request.method == 'POST':
-        form = EvaluacionFluidezForm(request.POST)
+        form = EvaluacionFluidezForm(request.POST, max_cantidad_palabra=cantidad_palabra_maxima)
         if form.is_valid():
             with transaction.atomic():
                 evaluacion = form.save(commit=False)
@@ -308,7 +324,7 @@ def carga_evaluacion(request, alumno_public_id):
             return redirect("lista", grado_public_id=grado_public)
     else:
         #Instancia vacia para metodo get
-        form = EvaluacionFluidezForm()
+        form = EvaluacionFluidezForm(max_cantidad_palabra=cantidad_palabra_maxima)
         #Creacion de diccionario para el Post
     context = {'form': form,
                'alumno':alumno_id}
@@ -321,9 +337,13 @@ def editar_evaluacion(request, alumno_public_id):
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     grado_public=instancia_grado.public_id
     instancia_evaluacion=EvaluacionFluidezLectora.objects.get(alumno_id=alumno_id.id)
-    form=EvaluacionFluidezForm(instance=instancia_evaluacion)
+    if instancia_grado.nombre_grado =='SEGUNDO':
+        cantidad_palabra_maxima=170
+    else:
+        cantidad_palabra_maxima=211
+    form=EvaluacionFluidezForm(instance=instancia_evaluacion, max_cantidad_palabra=cantidad_palabra_maxima)
     if request.method == 'POST':
-        form=EvaluacionFluidezForm(request.POST,instance=instancia_evaluacion)
+        form=EvaluacionFluidezForm(request.POST,instance=instancia_evaluacion,max_cantidad_palabra=cantidad_palabra_maxima)
         if form.is_valid():
             with transaction.atomic():
                 evaluacion=form.save(commit=False)
@@ -415,6 +435,15 @@ def borrar_registro_alumno(request,alumno_public_id):
                'alumno':alumno_id
                }
     return render(request,"borrar_registro_alumno.html",context)
+
+@login_required
+def monitoreo(request):
+    instancia_grado_cueanexo=Grado.objects.all()
+    # instancia_grado=Grado.objects.filter(cueanexo__in=instancia_grado_cueanexo).values_list('nombre_grado',flat=True)
+    # # for i in instancia_grado:
+    # #     print(i)
+    contexto={'grados':instancia_grado_cueanexo}
+    return render(request,"monitoreo.html", contexto)
 
 def ausentismo_evaluacion(instancia_evaluacion):
     evaluacion_campos=instancia_evaluacion._meta.fields
