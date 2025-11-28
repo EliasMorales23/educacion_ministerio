@@ -6,16 +6,17 @@ import uuid
 class Grado(models.Model):
     OPCIONES_GRADO = [
     # ('PRIMERO', '1er Grado'),
-    ('SEGUNDO', '2do Grado'),
-    ('TERCERO', '3er Grado'),
+    ('2do Año/Grado', '2do Grado'),
+    ('3er Año/Grado', '3er Grado'),
+    #cambiamos de SEGUNDO A 2do Año/Grado
     # ('CUARTO', '4to Grado'),
     # ('QUINTO', '5to Grado'),
     # ('SEXTO', '6to Grado'),
     # ('SEPTIMO', '7mo Grado'),
     ]
     public_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
-    cueanexo = models.IntegerField()#REPRESENTA A ESCUELA
-    nombre_grado = models.CharField(max_length=8, choices= OPCIONES_GRADO, default='SEGUNDO')
+    cueanexo = models.CharField(max_length=9)#REPRESENTA A ESCUELA
+    nombre_grado = models.CharField(max_length=13, choices= OPCIONES_GRADO, default='2do Año/Grado')
     class Meta:
        #managed = False
         db_table = 'grados' 
@@ -25,8 +26,6 @@ class Grado(models.Model):
 
 class Seccion(models.Model):
     OPCIONES_SECCION = [
-	('UNICO', 'Unico'),
-    ('UNICO', 'Multiple'),
     ('A', 'A'),
     ('B', 'B'),
     ('C', 'C'),
@@ -36,11 +35,20 @@ class Seccion(models.Model):
     ('G', 'G'),
     ('H', 'H'),
     ('I', 'I'),
-    ('J', 'J'),
-    ('K', 'K'),
+    ('L', 'L'),
+    ('M', 'M'),
+    ('N', 'N'),
+    ('P', 'P'),
+    ('Q', 'Q'),
+    ('R', 'R'),
+    ('S', 'S'),
+    ('T', 'T'),
+    ('U', 'U'),
+    ('Z', 'Z'),
+    
     ]
     OPCIONES_TURNO = [
-    ('MANANA', 'Mañana'),
+    ('MAÑANA', 'Mañana'),
     ('TARDE', 'Tarde'),
     ('DOBLE', 'Doble'),
     ]
@@ -104,6 +112,7 @@ class EvaluacionFluidezLectora(models.Model):
     pregunta_5 = models.CharField(max_length=10,choices= OPCIONES_EVALUACION, default='NORESPONDE',null=True)
     pregunta_6 = models.CharField(max_length=10,choices= OPCIONES_EVALUACION, default='NORESPONDE',null=True)
     asistencia = models.CharField(choices=OPCIONES_ASISTENCIA,default='AUSENTE')
+    encargado_carga=models.CharField(max_length=9)
     alumno = models.OneToOneField(Alumno,primary_key=True, on_delete=models.CASCADE)
     class Meta:
         #managed = False

@@ -153,18 +153,21 @@ def lista_grado(request,grado):
         nombre_usuario_cueanexo=name[8:]
     else:
         nombre_usuario_cueanexo=name
+    #cueanexo=int(nombre_usuario_cueanexo)   
 #-----logica para DNI+CUEANEXO---------
-    cueanexo=int(nombre_usuario_cueanexo)
-    if grado =='SEGUNDO' or grado =='TERCERO':
-            
-        try:
-            instancia_grado=Grado.objects.get(cueanexo=cueanexo, nombre_grado=grado)
+   
+    if grado =='SEGUNDO':
+        grado='2do Año/Grado'
+    elif grado =='TERCERO':
+            grado='3er Año/Grado'
+    try:
+        instancia_grado=Grado.objects.get(cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
 
-        # instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
-        # #print(instancia_seccion)
-        # instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
-            return redirect("lista", grado_public_id=instancia_grado.public_id)
-        except Grado.DoesNotExist:
+    # instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
+    # #print(instancia_seccion)
+    # instancia_grado=get_object_or_404(Grado,cueanexo=nombre_usuario_cueanexo, nombre_grado=grado)
+        return redirect("lista", grado_public_id=instancia_grado.public_id)
+    except Grado.DoesNotExist:
         #-------------------
         # seccion=get_object_or_404(Seccion,public_id=seccion_public_id)
         # instancia_seccion=Seccion.objects.filter(grado_id=seccion.grado_id)
@@ -181,7 +184,7 @@ def lista_grado(request,grado):
         #     #INSTANCIA GRADO FALTA COSNEGUIR DE CADA ALUMNO CADA GRADO
         # }
 
-            return render(request,"lista.html")
+        return render(request,"lista.html")
 #-----------grado y secciom-------------------------------------
 @login_required
 def grado(request):
@@ -194,11 +197,12 @@ def grado(request):
             nombre_usuario_cueanexo=name[8:]
         else:
             nombre_usuario_cueanexo=name
+        #cueanexo=int(nombre_usuario_cueanexo)
         #-----logica para DNI+CUEANEXO---------
-        cueanexo=int(nombre_usuario_cueanexo)
+        
     opciones_grado = [
-                     ('SEGUNDO', 'SEGUNDO'),
-                      ('TERCERO','TERCERO')
+                     ('2do Año/Grado', '2do Año/Grado'),
+                      ('3er Año/Grado','3er Año/Grado')
                         ]
     grado_form_data = GradoViewForm()
     if request.method == 'POST':
@@ -323,6 +327,7 @@ def carga_evaluacion(request, alumno_public_id):
                 evaluacion = form.save(commit=False)
                 evaluacion.alumno = alumno_id
                 evaluacion.asistencia ='PRESENTE'
+                evaluacion.encargado_carga='DIRECTOR'
                 evaluacion.save()
             return redirect("lista", grado_public_id=grado_public)
     else:
@@ -352,6 +357,7 @@ def editar_evaluacion(request, alumno_public_id):
                 evaluacion=form.save(commit=False)
                 evaluacion.alumno_id = alumno_id
                 evaluacion.asistencia='PRESENTE'
+                evaluacion.encargado_carga='DIRECTOR'
                 evaluacion.save()
             return redirect("lista", grado_public_id=grado_public)
     context = {
@@ -365,7 +371,7 @@ def asistencia(request,alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
     #SI instanciamos aca se crea antes de que confirme asistencia (puede ser conveniente)...
     instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
-        alumno_id=alumno_id.id)
+        alumno_id=alumno_id.id, encargado_carga='DIRECTOR')
     instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     grado_public=instancia_grado.public_id
