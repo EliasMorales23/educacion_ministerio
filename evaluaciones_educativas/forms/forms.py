@@ -4,7 +4,9 @@ from evaluaciones_educativas.models import *
 
 
 class GradoViewForm(forms.Form):
-	grado= forms.ChoiceField(label='SELECCIONE UN GRADO', required=False)
+	grado= forms.ChoiceField(label='SELECCIONE UN GRADO', required=False, widget=forms.RadioSelect(
+
+        ))
 
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)

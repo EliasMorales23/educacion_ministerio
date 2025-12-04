@@ -11,16 +11,16 @@ class SecondaryDBRouter:
 
     def db_for_read(self, model, **hints):
         if model._meta.app_label in self.route_apps:
-            return 'bd_evaluacion'
+            return 'Evaluacion'
         return 'default'
 
     def db_for_write(self, model, **hints):
         if model._meta.app_label in self.route_apps:
-            return 'bd_evaluacion'
+            return 'Evaluacion'
         return 'default'
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         # Asegura que las migraciones de esta app solo corran en su BD asignada
         if app_label in self.route_apps:
-            return db == 'bd_evaluacion'
+            return db == 'Evaluacion'
         return db == 'default'

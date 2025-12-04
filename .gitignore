@@ -18,3 +18,4 @@ entorno_ministerio_app/
 .idea/
 registration/
 *0001_initial.py
+venv_3.10/

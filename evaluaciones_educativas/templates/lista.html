@@ -317,8 +317,15 @@
           <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
             >Añadir Alumno</a
           >
+          {% comment %}
           <a href="{% url 'salir' %}" class="btn btn-danger btn-custom"
             >Cerrar Sesión</a
+          >
+          {% endcomment %}
+          <a
+            href="{% url 'excel' grado_public_id=grado_public_id%}"
+            class="btn btn-danger btn-custom"
+            >Descargar</a
           >
         </div>
       </div>
