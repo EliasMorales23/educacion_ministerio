@@ -1,0 +1,140 @@
+/*
+ * ------------------------------------------------------
+ * 1. Estilos Base y Layout (Flexbox)
+ * ------------------------------------------------------
+ */
+
+.navbar {
+  border-bottom: 1px solid #dee2e6;
+  padding: 0;
+}
+
+.navbar-container {
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Permitimos que el contenedor se envuelva en móvil */
+  flex-wrap: wrap;
+}
+
+/* Título de la Aplicación (Siempre visible) */
+.app-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #333;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.icon-stats {
+  font-size: 1.5em;
+  color: #0d6efd;
+  margin-right: 5px;
+}
+
+/* Menú Principal de Navegación */
+.nav-link {
+  text-decoration: none;
+  color: #495057 !important;
+  font-size: 0.95em;
+  padding: 10px 15px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Colores de Íconos */
+.icon-home {
+  color: #f2a600;
+}
+.icon-school {
+  color: #0d6efd;
+}
+.fa-archive {
+  color: black;
+}
+.icon-collect {
+  color: #d63384;
+}
+.nav-link span,
+.nav-link i {
+  margin-right: 4px;
+  font-size: 1.2em;
+}
+
+/* Información del Usuario */
+.user-info {
+  font-size: 0.95em;
+  color: #333;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.icon-user {
+  font-size: 1.8em;
+  color: #198754;
+  margin-left: 10px;
+}
+
+/*
+ * ------------------------------------------------------
+ * 2. MEDIA QUERIES PARA RESPONSIVIDAD (Celulares)
+ * ------------------------------------------------------
+ */
+
+/* Aplicar estilos cuando la pantalla es pequeña (Hasta 991.98px, el breakpoint 'lg' de Bootstrap) */
+@media (max-width: 991.98px) {
+  /* 1. Ajuste del Contenedor en Móvil */
+  .navbar-container {
+    /* Asegura que el logo y el botón estén en la misma línea */
+    flex-wrap: nowrap;
+  }
+
+  /* 2. Ajuste del Menú Colapsable */
+  .collapse.navbar-collapse {
+    /* Ocupa todo el ancho cuando está abierto */
+    width: 100%;
+    /* Añade padding para separar el menú de los bordes */
+    padding: 10px 0;
+  }
+
+  /* 3. Estilo de los Enlaces del Menú Abierto */
+  .main-menu ul.navbar-nav {
+    /* Los enlaces se apilan verticalmente */
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee; /* Separador visual */
+  }
+
+  /* 4. Ocultar el ícono de usuario grande en móvil si está fuera del colapsable (aunque ya lo hace la clase d-none) */
+  .user-info {
+    margin-left: 0 !important;
+  }
+  /* Reglas para la imagen del logo */
+  .brand-image {
+    /* 1. Definimos la altura deseada (¡CLAVE!) */
+    height: 30px; /* Puedes usar 25px si quieres que sea aún más pequeña */
+
+    /* 2. El ancho se ajusta automáticamente para mantener la proporción original */
+    width: auto;
+
+    /* 3. Ajuste fino de alineación vertical */
+    /* Mueve la imagen ligeramente hacia arriba para centrarla en la línea de texto de Bootstrap */
+    margin-top: -0.2rem;
+
+    /* 4. Espacio entre la imagen y el texto "Estadística Educativa" */
+    margin-right: 0.5rem;
+
+    /* Opcional: Aseguramos que la opacidad del HTML se respete si no la has definido en otro lugar */
+    opacity: 0.8;
+  }
+
+  /* Regla complementaria para el contenedor (Opcional, pero recomendado) */
+  .navbar-brand {
+    /* Asegura que la altura de línea no sea excesiva, lo que ayudaría a reducir el espacio vertical */
+    line-height: 1.2;
+  }
+}

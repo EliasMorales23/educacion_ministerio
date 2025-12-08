@@ -6,6 +6,8 @@ from evaluaciones_educativas.forms.forms import *
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from datetime import date, datetime
+from openpyxl import Workbook
 
 
 @login_required
@@ -32,6 +34,8 @@ def carga_alumno(request,grado_public_id):
                 alumno = alumno_form.save(commit=False)
                 alumno.seccion = instancia_seccion
                 alumno.save()
+                instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
+                alumno_id=alumno.id,cantidad_palabras_leidas=None, pregunta_1=None, pregunta_2=None, pregunta_3=None, pregunta_4=None, pregunta_5=None, pregunta_6=None, asistencia='AUSENTE',encargado_carga='APLICADOR')
             return redirect("asistencia", alumno_public_id=alumno.public_id)
             
     context = {
@@ -118,6 +122,7 @@ def lista_grado(request,grado):
         return redirect("lista", grado_public_id=instancia_grado.public_id)
     except Grado.DoesNotExist:
         return render(request,"lista.html")
+    
 @login_required
 def grado(request):
     usuario= request.user
@@ -161,8 +166,6 @@ def grado(request):
 def carga_evaluacion(request, alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
     instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
-    # seccion_public=instancia_seccion.public_id
-    # turno_seccion=instancia_seccion.turno
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     grado_public=instancia_grado.public_id
     # print(instancia_grado.nombre_grado)
@@ -170,14 +173,23 @@ def carga_evaluacion(request, alumno_public_id):
         cantidad_palabra_maxima=170
     else:
         cantidad_palabra_maxima=211
+
+    evaluacion_existente = None
+    try:
+        # Buscamos el examen que se creó previamente con get_or_create
+        # ASUMO que tu modelo se llama EvaluacionFluidezLectora
+        evaluacion_existente = EvaluacionFluidezLectora.objects.get(alumno=alumno_id.id)
+    except EvaluacionFluidezLectora.DoesNotExist:
+        # Si no existe, el formulario será de CREACIÓN (INSERT)
+        pass
     if request.method == 'POST':
-        form = EvaluacionFluidezForm(request.POST, max_cantidad_palabra=cantidad_palabra_maxima)
+        form = EvaluacionFluidezForm(request.POST, max_cantidad_palabra=cantidad_palabra_maxima, instance=evaluacion_existente)
         if form.is_valid():
             with transaction.atomic():
                 evaluacion = form.save(commit=False)
                 evaluacion.alumno = alumno_id
                 evaluacion.asistencia ='PRESENTE'
-                evaluacion.encargado_carga='DIRECTOR'
+                evaluacion.encargado_carga='APLICADOR'
                 evaluacion.save()
             return redirect("lista", grado_public_id=grado_public)
     else:
@@ -194,7 +206,7 @@ def editar_evaluacion(request, alumno_public_id):
     instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     grado_public=instancia_grado.public_id
-    instancia_evaluacion=EvaluacionFluidezLectora.objects.get(alumno_id=alumno_id.id)
+    instancia_evaluacion=get_object_or_404(EvaluacionFluidezLectora,alumno_id=alumno_id.id)
     if instancia_grado.nombre_grado =='SEGUNDO':
         cantidad_palabra_maxima=170
     else:
@@ -207,7 +219,7 @@ def editar_evaluacion(request, alumno_public_id):
                 evaluacion=form.save(commit=False)
                 evaluacion.alumno_id = alumno_id
                 evaluacion.asistencia='PRESENTE'
-                evaluacion.encargado_carga='DIRECTOR'
+                evaluacion.encargado_carga='APLICADOR'
                 evaluacion.save()
             return redirect("lista", grado_public_id=grado_public)
     context = {
@@ -219,9 +231,8 @@ def editar_evaluacion(request, alumno_public_id):
 @login_required
 def asistencia(request,alumno_public_id):
     alumno_id=get_object_or_404(Alumno, public_id=alumno_public_id)
-    #SI instanciamos aca se crea antes de que confirme asistencia (puede ser conveniente)...
-    instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(
-        alumno_id=alumno_id.id, encargado_carga='DIRECTOR')
+     #SI instanciamos aca recibe la evalaucion que se creo en carga...
+    instancia_evaluacion=get_object_or_404(EvaluacionFluidezLectora, alumno_id=alumno_id.id) 
     instancia_seccion=get_object_or_404(Seccion,id=alumno_id.seccion_id)
     instancia_grado=get_object_or_404(Grado,id=instancia_seccion.grado_id)
     grado_public=instancia_grado.public_id
@@ -262,7 +273,7 @@ def editar_asistencia(request,alumno_public_id):
                     return redirect("editar_evaluacion", alumno_public_id=alumno_id.public_id)
                 else:
                     #Recien instanciamos en el ELSE 
-                    instancia_evaluacion, creando_evaluacion=EvaluacionFluidezLectora.objects.get_or_create(alumno_id=alumno_id.id)
+                    instancia_evaluacion=get_object_or_404(EvaluacionFluidezLectora, alumno_id=alumno_id.id)
                     evaluacion=ausentismo_evaluacion(instancia_evaluacion)
                     evaluacion.save()
                     return redirect("lista", grado_public_id=grado_public)
@@ -294,6 +305,59 @@ def borrar_registro_alumno(request,alumno_public_id):
                }
     return render(request,"borrar_registro_alumno.html",context)
 
+@login_required
+def descargar_excel(request,grado_public_id):
+    instancia_grado=get_object_or_404(Grado,public_id=grado_public_id)
+    instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
+    alumnos = Alumno.objects.filter(seccion_id__in=instancia_seccion).order_by('nombre')
+    evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
+    # 1. Configurar la respuesta HTTP para un archivo Excel
+    # El 'mimetype' (o Content-Type) es crucial para que el navegador sepa que es un archivo .xlsx
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    
+    # 2. Configurar el encabezado Content-Disposition
+    # Esto le dice al navegador que DEBE descargar el contenido y le asigna un nombre de archivo.
+    if instancia_grado.nombre_grado=='2do Año/Grado':
+        nombre_grado='2do_Grado_'
+    elif instancia_grado.nombre_grado=='3er Año/Grado':
+        nombre_grado='3er_Grado_'
+    else:
+        nombre_grado='_'
+    response['Content-Disposition'] = f'attachment; filename="reporte_fluidez_{nombre_grado}noviembre_2025.xlsx"'
+
+    # 3. Generar el contenido del Excel (lo mismo que tenías)
+    wb = Workbook()
+    ws = wb.active
+    fecha_hora_actual = datetime.now()
+    ws['A1'] = f'CUEANEXO: {instancia_grado.cueanexo}'
+    ws['G1'] = f'FECHA Y HORA:  {fecha_hora_actual.strftime("%d/%m/%Y %I:%M:%S %p")}'
+    lista=['NOMBRE','APELLIDO','DNI','COMUNIDAD INDíGENA','DISCAPACIDAD','GRADO','SECCIÓN','TURNO','ASISTENCIA','FLUIDEZ','P1','P2','P3','P4','P5','P6']
+    #print(alumnos)
+    ws.append(lista)
+    for i,v in enumerate(evaluacion):
+        ws[f'A{i + 3}']=v.alumno.nombre
+        ws[f'B{i + 3}']=v.alumno.apellido
+        ws[f'C{i + 3}']=v.alumno.dni
+        ws[f'D{i + 3}']=v.alumno.comunidad_indigena
+        ws[f'E{i + 3}']=v.alumno.discapacidad
+        ws[f'F{i + 3}']=v.alumno.seccion.grado.nombre_grado
+        ws[f'G{i + 3}']=v.alumno.seccion.seccion
+        ws[f'H{i + 3}']=v.alumno.seccion.turno
+        ws[f'I{i + 3}']=v.asistencia
+        ws[f'J{i + 3}']=v.cantidad_palabras_leidas
+        ws[f'K{i + 3}']=v.pregunta_1
+        ws[f'L{i + 3}']=v.pregunta_2
+        ws[f'M{i + 3}']=v.pregunta_3
+        ws[f'N{i + 3}']=v.pregunta_4
+        ws[f'O{i + 3}']=v.pregunta_5
+        ws[f'P{i + 3}']=v.pregunta_6
+
+    wb.save(response)
+    # 5. Retornar la respuesta al navegador
+    return response
+
 # @login_required
 # def monitoreo(request):
 #     instancia_grado_cueanexo=Grado.objects.all()
@@ -314,62 +378,13 @@ def ausentismo_evaluacion(instancia_evaluacion):
             setattr(instancia_evaluacion, i.name, None)
     return instancia_evaluacion
 
+@login_required
+def inicio_aplicador(request):
+    return render(request,"header_director.html")
+
 #logica de logue--BORRAR-------------------
 def salir(request):
     logout(request)
-    return redirect('accounts/login.html')
+    return redirect('inicio')
 #-----------------------------
 
-from openpyxl import Workbook
-import datetime
-from datetime import date
-from django.http import HttpResponse
-
-@login_required
-def descargar_excel(request,grado_public_id):
-    instancia_grado=get_object_or_404(Grado,public_id=grado_public_id)
-    instancia_seccion=Seccion.objects.filter(grado_id=instancia_grado)
-    alumnos = Alumno.objects.filter(seccion_id__in=instancia_seccion)
-    evaluacion = EvaluacionFluidezLectora.objects.filter(alumno__in=alumnos)
-    # 1. Configurar la respuesta HTTP para un archivo Excel
-    # El 'mimetype' (o Content-Type) es crucial para que el navegador sepa que es un archivo .xlsx
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    )
-    
-    # 2. Configurar el encabezado Content-Disposition
-    # Esto le dice al navegador que DEBE descargar el contenido y le asigna un nombre de archivo.
-    response['Content-Disposition'] = 'attachment; filename="reporte_generado.xlsx"'
-
-    # 3. Generar el contenido del Excel (lo mismo que tenías)
-    wb = Workbook()
-    ws = wb.active
-    fecha_hora_actual = datetime.datetime.now()
-    ws['A1'] = f'CUEANEXO: {instancia_grado.cueanexo}'
-    ws['B1'] = f'Fecha y hora:  {fecha_hora_actual.strftime("%d/%m/%Y %I:%M:%S %p")}'
-    lista=['NOMBRE','APELLIDO','DNI','COMUNIDAD INDIGENA','DISCAPACIDAD','GRADO','SECCION','TURNO','ASISTENCIA','FLUIDEZ','P1','P2','P3','P4','P5','P6']
-    print(alumnos)
-    ws.append(lista)
-    for i,v in enumerate(evaluacion):
-        ws[f'A{i + 3}']=v.alumno.nombre
-        ws[f'B{i + 3}']=v.alumno.apellido
-        ws[f'C{i + 3}']=v.alumno.dni
-        ws[f'D{i + 3}']=v.alumno.comunidad_indigena
-        ws[f'E{i + 3}']=v.alumno.discapacidad
-        ws[f'F{i + 3}']=v.alumno.seccion.grado.nombre_grado
-        ws[f'G{i + 3}']=v.alumno.seccion.seccion
-        ws[f'H{i + 3}']=v.alumno.seccion.turno
-        ws[f'I{i + 3}']=v.asistencia
-        ws[f'J{i + 3}']=v.cantidad_palabras_leidas
-        ws[f'K{i + 3}']=v.pregunta_1
-        ws[f'L{i + 3}']=v.pregunta_2
-        ws[f'M{i + 3}']=v.pregunta_3
-        ws[f'N{i + 3}']=v.pregunta_4
-        ws[f'O{i + 3}']=v.pregunta_5
-        ws[f'P{i + 3}']=v.pregunta_6
-
-    
-    wb.save(response)
-
-    # 5. Retornar la respuesta al navegador
-    return response

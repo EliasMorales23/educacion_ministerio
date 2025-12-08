@@ -19,7 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('evaluaciones_educativas/',include('evaluaciones_educativas.urls')),
+	path('',include('evaluaciones_educativas.urls')),
     #borrar
     path('accounts/', include('django.contrib.auth.urls')),
 	

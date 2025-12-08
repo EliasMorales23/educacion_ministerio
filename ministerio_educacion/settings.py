@@ -15,6 +15,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATIC_URL ya debe estar definido (usualmente '/staticfiles/')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -23,14 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&6^kli45!=0kz%*1q%@rv7@skf8_vmjnwf3^!7fyluf!$r=4h+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','198.41.192.57','headlines-licensed-sociology-bee.trycloudflare.com','https://brooks-locator-prepaid-continental.trycloudflare.com']
+ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    # Puedes añadir otros orígenes de confianza aquí:
-    # 'http://127.0.0.1:8000',
-    'https://headlines-licensed-sociology-bee.trycloudflare.com',
-    'https://brooks-locator-prepaid-continental.trycloudflare.com',
 ]
 # Application definition
 

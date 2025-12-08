@@ -185,7 +185,7 @@
     <div id="sidebar-wrapper">
       <ul class="nav flex-column px-2">
         <li class="nav-item">
-          <a href="https://visoreducativochaco.com.ar/" class="nav-link">
+          <a href="{% url 'inicio'%}"class="nav-link">
             <i class="bi bi-house"></i> <span>Home</span>
           </a>
         </li>
@@ -317,16 +317,28 @@
           <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
             >Añadir Alumno</a
           >
-          {% comment %}
+          
           <a href="{% url 'salir' %}" class="btn btn-danger btn-custom"
             >Cerrar Sesión</a
           >
-          {% endcomment %}
-          <a
-            href="{% url 'excel' grado_public_id=grado_public_id%}"
-            class="btn btn-danger btn-custom"
-            >Descargar</a
-          >
+          {% if grado_public_id %}
+    {# Opción 1: El ID existe, botón funcional (con etiqueta <a>) #}
+    <a
+        href="{% url 'excel' grado_public_id=grado_public_id %}"
+        class="btn btn-danger btn-custom"
+    >
+        Descargar
+    </a>
+{% else %}
+    {# Opción 2: El ID NO existe, botón deshabilitado (con etiqueta <button>) #}
+    <button 
+        class="btn btn-danger btn-custom"
+        disabled 
+        title="El ID del grado no está disponible para la descarga."
+    >
+        Descargar
+    </button>
+{% endif %}
         </div>
       </div>
     </div>

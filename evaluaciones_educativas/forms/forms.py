@@ -5,15 +5,11 @@ from evaluaciones_educativas.models import *
 
 class GradoViewForm(forms.Form):
 	grado= forms.ChoiceField(label='SELECCIONE UN GRADO', required=False, widget=forms.RadioSelect(
-
         ))
 
 class SeccionViewForm(forms.Form):
 	seccion= forms.ChoiceField(label='secciones', required=False)
 
-	
-# class TurnoViewForm(forms.Form):
-# 	turno= forms.ChoiceField(label='Turnos', required=False)
 
 class AlumnoForm(forms.ModelForm):
 
@@ -38,7 +34,11 @@ class AlumnoForm(forms.ModelForm):
                 'required': 'true', 
                 'placeholder': 'APELLIDO DEL ALUMNO EN MAYUSCULA',
 				'pattern': '[A-ZÑÁÉÍÓÚ ]*'
-			})
+			}),
+			'comunidad_indigena': forms.Select(
+				attrs={'required': 'true'}),
+			'discapacidad': forms.Select(
+				attrs={'required': 'true'})
 			}
 		#label para cambiar nombre de campo
 
@@ -60,7 +60,20 @@ class EvaluacionFluidezForm(forms.ModelForm):
 			'cantidad_palabras_leidas': forms.NumberInput(attrs={
 			'min':'0',
 			'placeholder':'INGRESA LA CANTIDAD DE PALABRAS LEIDAS'
-			})}
+			}),
+			'pregunta_1': forms.Select(
+				attrs={'required': 'true'}),
+			'pregunta_2': forms.Select(
+				attrs={'required': 'true'})
+				,'pregunta_3': forms.Select(
+				attrs={'required': 'true'}),
+			'pregunta_4': forms.Select(
+				attrs={'required': 'true'})
+				,'pregunta_5': forms.Select(
+				attrs={'required': 'true'}),
+			'pregunta_6': forms.Select(
+				attrs={'required': 'true'})
+			}
 		
 	def __init__(self, *args, max_cantidad_palabra=None, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -96,7 +109,13 @@ class SeccionForm(forms.ModelForm):
 	class Meta:
 		model = Seccion
 		fields=['seccion','turno']
-		
+		widgets = {
+			'seccion': forms.Select(
+				attrs={'required': 'true'}),
+				'turno': forms.Select(
+				attrs={'required': 'true'})
+				}
+	
 	
 class BorrarRegistroAlumnoForm(forms.Form):
 		borrar= forms.BooleanField(label='borrar',required=False,
