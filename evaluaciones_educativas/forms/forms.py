@@ -1,7 +1,21 @@
 from django import forms
 from evaluaciones_educativas.models import *
 
-
+class CueanexoViewForm(forms.Form):
+	cueanexo = forms.CharField(
+        label='CUE/Anexo',
+        max_length=20,  # Ajusta la longitud máxima según tus necesidades
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 001/01'})
+    )
+class DniViewForm(forms.Form):
+	# El DNI debería ser un campo de número o texto, dependiendo de si manejas puntos/guiones. 
+    # Usamos CharField por flexibilidad.
+    dni = forms.CharField(
+        label='DNI del Alumno',
+		min_length=8,
+        max_length=8,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 12345678', 'pattern': '[0-9]*', 'inputmode': 'numeric'})
+    )
 
 class GradoViewForm(forms.Form):
 	grado= forms.ChoiceField(label='SELECCIONE UN GRADO', required=False, widget=forms.RadioSelect(

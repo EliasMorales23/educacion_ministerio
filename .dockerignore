@@ -1,0 +1,12 @@
+# Entornos virtuales
+venv/
+env_3.10/
+.vscode/
+
+# Configuración local sensible
+.env
+__pycache__/
+
+# Bases de datos locales (para evitar subirlas a la imagen)
+db.sqlite3
+/app/data/*

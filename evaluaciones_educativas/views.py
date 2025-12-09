@@ -295,9 +295,9 @@ def borrar_registro_alumno(request,alumno_public_id):
                 eleccion= form.cleaned_data["borrar"]
                 if eleccion:
                     alumno_id.delete()
-                    return redirect("lista", grado_public_id=grado_public)
+                    return redirect("lista_filtro_monitoreo")
                 else:
-                    return redirect("lista", grado_public_id=grado_public)
+                    return redirect("lista_filtro_monitoreo")
     else:
         form = BorrarRegistroAlumnoForm()
     context = {'form': form,
@@ -367,6 +367,37 @@ def descargar_excel(request,grado_public_id):
 #     contexto={'grados':instancia_grado_cueanexo}
 #     return render(request,"monitoreo.html", contexto)
 
+#---------------------------------------------------------
+@login_required
+def filtro_monitoreo(request): 
+    evaluacion=None
+    if request.method == 'POST':
+        #form_cueanexo = CueanexoViewForm(request.POST)
+        form_dni= DniViewForm(request.POST)
+        if form_dni.is_valid():
+            with transaction.atomic():
+                # cueanexo= form_cueanexo.cleaned_data["cueanexo"]
+                dni= form_dni.cleaned_data["dni"] 
+                # instancia_grado=Grado.objects.filter(cueanexo__in=cueanexo)
+                # instancia_seccion=get_object_or_404(Seccion,grado_id=instancia_grado)
+                try: 
+                    alumno = Alumno.objects.get(dni=dni)
+                    evaluacion = EvaluacionFluidezLectora.objects.get(alumno=alumno)
+                except Alumno.DoesNotExist:
+                    alumno = 'vacio' # No encontró el alumno
+                except EvaluacionFluidezLectora.DoesNotExist:
+                    evaluacion = 'vacio' # Encontró el alumno, pero no la evalua
+
+
+    else:           
+        # form_cueanexo = CueanexoViewForm()
+        form_dni = DniViewForm()
+    contexto = {
+        'form_dni': form_dni,
+        'evaluacion':evaluacion}
+    return render(request,"lista_filtro_monitoreo.html",contexto)
+#--------------------------------------------------------
+
 def ausentismo_evaluacion(instancia_evaluacion):
     evaluacion_campos=instancia_evaluacion._meta.fields
     for i in evaluacion_campos:
@@ -385,6 +416,6 @@ def inicio_aplicador(request):
 #logica de logue--BORRAR-------------------
 def salir(request):
     logout(request)
-    return redirect('inicio')
+    return redirect('lista_filtro_monitoreo')
 #-----------------------------
 

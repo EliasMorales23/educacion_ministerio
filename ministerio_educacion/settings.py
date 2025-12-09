@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 """
 Django settings for ministerio_educacion project.
 
@@ -15,6 +18,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 # STATIC_URL ya debe estar definido (usualmente '/staticfiles/')
 
@@ -22,8 +27,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&6^kli45!=0kz%*1q%@rv7@skf8_vmjnwf3^!7fyluf!$r=4h+'
-
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY_EVALUACION')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -75,15 +79,27 @@ WSGI_APPLICATION = 'ministerio_educacion.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
+CLOUD_SQL_CONNECTION_NAME = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
+POSTGRES_DB_NAME_GOOGLE = os.environ.get('POSTGRES_DB_NAME_GOOGLE')
+DATABASES ={
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB_NAME_GOOGLE'), 
+        'USER': os.environ.get('POSTGRES_USER_GOOGLE'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD_GOOGLE'),
+        'HOST': f'/cloudsql/{CLOUD_SQL_CONNECTION_NAME}', 
+        'PORT': ''
     },
-    'Evaluacion': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db_evaluacion.sqlite3',
+     'Evaluacion': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.environ.get('POSTGRES_DB_EVALUACION'),
+        'USER': os.environ.get('POSTGRES_USER_EVALUACION'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD_EVALUACION'),
+        'HOST': os.environ.get('POSTGRES_HOST_EVALUACION'),
+        'PORT': os.environ.get('POSTGRES_PORT_EVALUACION'),
+        'OPTIONS': {
+            'options': '-c search_path=evaluacion,public',
+        }
     }
     
 }
