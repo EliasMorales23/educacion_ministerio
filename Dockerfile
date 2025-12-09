@@ -23,4 +23,5 @@ RUN python manage.py collectstatic --no-input
 
 # Comando que se ejecuta al iniciar el contenedor (usando Gunicorn)
 # El puerto se toma de la variable ENV PORT=8080
-CMD exec gunicorn evaluaciones_educativas.wsgi:application --bind :$PORT
+
+CMD exec gunicorn ministerio_educacion.wsgi:application --bind :$PORT
