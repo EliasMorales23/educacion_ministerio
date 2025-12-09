@@ -5,7 +5,7 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED 1
 ENV PORT=8080 
 # Nombre de la carpeta principal de configuracion de Django
-ENV DJANGO_SETTINGS_MODULE=evaluaciones_educativas_app.settings 
+ENV DJANGO_SETTINGS_MODULE=evaluaciones_educativas.settings 
 
 # Establece el directorio de trabajo
 WORKDIR /app
