@@ -16,6 +16,6 @@ entorno_ministerio_app/
 .venv/
 .vscode/
 .idea/
-*0001_initial.py
 venv_3.10/
 venv_3.11/
+.env

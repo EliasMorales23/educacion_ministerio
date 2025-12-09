@@ -1,3 +1,7 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
 """
 Django settings for ministerio_educacion project.
 
@@ -14,8 +18,9 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+DOTENV_PATH = BASE_DIR / '.env'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+load_dotenv(DOTENV_PATH)
 # STATIC_URL ya debe estar definido (usualmente '/staticfiles/')
 
 # Quick-start development settings - unsuitable for production
@@ -71,8 +76,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ministerio_educacion.wsgi.application'
-
-
+print(os.environ.get('POSTGRES_USER_EVALUACION'))
+print(os.environ.get('POSTGRES_DB_EVALUACION'))
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -82,10 +87,16 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     },
     'Evaluacion': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db_evaluacion.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB_EVALUACION'),
+        'USER': os.environ.get('POSTGRES_USER_EVALUACION'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD_EVALUACION'),
+        'HOST': os.environ.get('POSTGRES_HOST_EVALUACION'),
+        'PORT': os.environ.get('POSTGRES_PORT_EVALUACION'),
+        'OPTIONS': {
+            'options': '-c search_path=evaluacion,public',
+        }
     }
-    
 }
 DATABASE_ROUTERS = ['evaluaciones_educativas.routers.SecondaryDBRouter']
 
