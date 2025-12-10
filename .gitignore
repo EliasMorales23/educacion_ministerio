@@ -19,3 +19,4 @@ entorno_ministerio_app/
 venv_3.10/
 venv_3.11/
 .env
+aplicadores_env/
