@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'ministerio_educacion.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-CLOUD_SQL_CONNECTION_NAME = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-POSTGRES_DB_NAME_GOOGLE = os.environ.get('POSTGRES_DB_NAME_GOOGLE')
+# # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# CLOUD_SQL_CONNECTION_NAME = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
+# POSTGRES_DB_NAME_GOOGLE = os.environ.get('POSTGRES_DB_NAME_GOOGLE')
 DATABASES ={
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
