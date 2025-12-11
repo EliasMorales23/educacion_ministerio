@@ -274,13 +274,112 @@
               </table>
             </div>
 
-            {% elif evaluacion == 'vacio' %}
+            {% elif evaluacion == 'vacio' and alumno %}
+            <div class="alert alert-success">
+              ✅ Registro SIN EXAMEN encontrado con éxito.
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th colspan="7" class="text-center bg-alumno">
+                      Datos del Alumno
+                    </th>
+                    <th colspan="8" class="text-center bg-comprension">
+                      Resultados de la Evaluación
+                    </th>
+                    <th rowspan="2" class="text-center bg-alumno">Acción</th>
+                  </tr>
+
+                  <tr>
+                    <th>Cueanexo</th>
+                    <th>Grado</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Sección</th>
+                    <th>Turno</th>
+                    <th>Asistencia</th>
+                    <th>P. Leídas</th>
+                    <th>P1</th>
+                    <th>P2</th>
+                    <th>P3</th>
+                    <th>P4</th>
+                    <th>P5</th>
+                    <th>P6</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>{{ alumno.seccion.grado.cueanexo|default:'-' }}</td>
+                    <td>{{alumno.seccion.grado.nombre_grado|default:'-'}}</td>
+                    <td>
+                      <strong>{{alumno.nombre|default:'-' }}</strong>
+                    </td>
+                    <td>{{ alumno.apellido|default:'-' }}</td>
+                    <td>{{ alumno.dni|default:'-' }}</td>
+                    <td>{{ seccion.seccion|default:'-' }}</td>
+                    <td>{{ seccion.turno|default:'-' }}</td>
+                    <td>{{ evaluacion.asistencia|default:'-' }}</td>
+                    <td>
+                      {{ evaluacion.cantidad_palabras_leidas|default:"-" }}
+                    </td>
+                    <td>{{ evaluacion.pregunta_1|default:'-' }}</td>
+                    <td>{{ evaluacion.pregunta_2|default:'-' }}</td>
+                    <td>{{ evaluacion.pregunta_3|default:'-' }}</td>
+                    <td>{{ evaluacion.pregunta_4|default:'-' }}</td>
+                    <td>{{ evaluacion.pregunta_5|default:'-' }}</td>
+                    <td>{{ evaluacion.pregunta_6|default:'-' }}</td>
+
+                    <td class="text-center">
+                      <div
+                        class="d-inline-flex flex-wrap gap-1 justify-content-center"
+                      >
+                        {% comment %}
+                        <a
+                          href="{% url 'editar_alumno' alumno_public_id=evaluacion.alumno.public_id %}"
+                          class="btn btn-sm btn-outline-primary btn-custom"
+                          title="Editar Datos del Alumno"
+                        >
+                          <i class="bi bi-person"></i>
+                        </a>
+
+                        <a
+                          href="{% url 'editar_evaluacion' alumno_public_id=evaluacion.alumno.public_id %}"
+                          class="btn btn-sm btn-outline-success btn-custom"
+                          title="Editar Evaluación"
+                        >
+                          <i class="bi bi-journal-check"></i>
+                        </a>
+                        {% endcomment %}
+
+                        <a
+                          href="{% url 'borrar_registro_alumno_sin_evaluacion' alumno_public_id=alumno.public_id %}"
+                          class="btn btn-sm btn-outline-danger btn-custom"
+                          title="Borrar Registro SIN EVALUACION"
+                        >
+                          <i class="bi bi-x-circle"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {% comment %} {% elif evaluacion == 'vacio' %}
             <div class="alert alert-danger">
               ❌ **Error:** No se encontró ningún registro de evaluación o
               alumno con el DNI ingresado. Por favor, verifique el número e
               intente de nuevo.
             </div>
-
+            {% endcomment %} {% elif alumno == 'vacio' %}
+            <div class="alert alert-danger">
+              ❌ **Error:** No se encontró ningún registro de evaluación o
+              alumno con el DNI ingresado. Por favor, verifique el número e
+              intente de nuevo.
+            </div>
             {% else %}
             <div class="alert alert-info">
               🔎 Ingrese el DNI del alumno arriba para iniciar la búsqueda de su

@@ -370,6 +370,7 @@ def descargar_excel(request,grado_public_id):
 #---------------------------------------------------------
 @login_required
 def filtro_monitoreo(request): 
+    alumno = None
     evaluacion=None
     if request.method == 'POST':
         #form_cueanexo = CueanexoViewForm(request.POST)
@@ -382,17 +383,20 @@ def filtro_monitoreo(request):
                 # instancia_seccion=get_object_or_404(Seccion,grado_id=instancia_grado)
                 try: 
                     alumno = Alumno.objects.get(dni=dni)
+                    print(alumno)
                     evaluacion = EvaluacionFluidezLectora.objects.get(alumno=alumno)
+                    print(evaluacion)
                 except Alumno.DoesNotExist:
                     alumno = 'vacio' # No encontró el alumno
                 except EvaluacionFluidezLectora.DoesNotExist:
                     evaluacion = 'vacio' # Encontró el alumno, pero no la evalua
-
+                    print(evaluacion)
 
     else:           
         # form_cueanexo = CueanexoViewForm()
         form_dni = DniViewForm()
     contexto = {
+        'alumno':alumno,
         'form_dni': form_dni,
         'evaluacion':evaluacion}
     return render(request,"lista_filtro_monitoreo.html",contexto)
@@ -419,3 +423,14 @@ def salir(request):
     return redirect('lista_filtro_monitoreo')
 #-----------------------------
 
+
+@login_required
+def borrar_registro_alumno_sin_evaluacion(request,alumno_public_id):
+    alumno = get_object_or_404(Alumno, public_id=alumno_public_id)
+
+    # 2. Borrar el registro
+    alumno.delete()
+    
+    # 3. ¡IMPORTANTE! Devolver la redirección.
+    #    'lista_filtro_monitoreo' debe ser el *nombre* de la URL en tu urls.py
+    return redirect('lista_filtro_monitoreo')

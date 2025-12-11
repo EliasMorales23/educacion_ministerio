@@ -18,6 +18,7 @@ urlpatterns = [
     # path('descargar_excel/<uuid:grado_public_id>/',views.descargar_excel, name='excel'),
     path('salir/',views.salir, name='salir'),
     path('',views.filtro_monitoreo, name='lista_filtro_monitoreo'),
+    path('borrar_registro_alumno_sin_evaluaciono/<uuid:alumno_public_id>/',views.borrar_registro_alumno_sin_evaluacion, name='borrar_registro_alumno_sin_evaluacion'),
    # path('',views.inicio_aplicador, name='inicio')
     # path('monitoreo/',views.monitoreo, name='monitoreo'),
 	
