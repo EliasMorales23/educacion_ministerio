@@ -1,35 +1,32 @@
 # Usa una imagen base oficial de Python
 FROM python:3.11-slim
 
-# Variables de entorno
+# Evita buffer de Python
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8080
 ENV DJANGO_SETTINGS_MODULE=ministerio_educacion.settings
-# Variables para superusuario
-ENV DJANGO_SUPERUSER_USERNAME=admin
-ENV DJANGO_SUPERUSER_EMAIL=eliasmorales.21@hotmail.com
-ENV DJANGO_SUPERUSER_PASSWORD=42263226
 
 # Directorio de trabajo
 WORKDIR /app
 
-# Copia dependencias e instala
+# Dependencias necesarias para psycopg2
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar dependencias
 COPY requirements.txt /app/
+
+# Instalar dependencias
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copia todo el código del proyecto
+# Copiar el proyecto
 COPY . /app
 
-# Recolección de archivos estáticos
-RUN python manage.py collectstatic --no-input
+# ❌ NO correr collectstatic porque vos ya tenés la carpeta staticfiles
+# RUN python manage.py collectstatic --no-input
 
-# Ejecuta migraciones y crea superusuario
-RUN python manage.py migrate --no-input
-RUN python manage.py migrate --database=Evaluacion --no-input
-RUN python manage.py createsuperuser --no-input \
-    --username $DJANGO_SUPERUSER_USERNAME \
-    --email $DJANGO_SUPERUSER_EMAIL
-
-# Comando de inicio (Gunicorn)
-CMD exec gunicorn ministerio_educacion.wsgi:application --bind :$PORT
+# Ejecutar migraciones + levantar Gunicorn al iniciar el contenedor
+CMD ["sh", "-c", "python manage.py migrate --no-input && gunicorn ministerio_educacion.wsgi:application --bind 0.0.0.0:$PORT"]
