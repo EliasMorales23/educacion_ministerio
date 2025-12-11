@@ -85,11 +85,11 @@ POSTGRES_DB_NAME_GOOGLE = os.environ.get('POSTGRES_DB_NAME_GOOGLE')
 DATABASES ={
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB_NAME_GOOGLE'), 
-        'USER': os.environ.get('POSTGRES_USER_GOOGLE'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD_GOOGLE'),
-        'HOST': f'/cloudsql/{CLOUD_SQL_CONNECTION_NAME}', 
-        'PORT': ''
+        'NAME': os.environ.get('POSTGRES_DB_RENDER'),
+        'USER': os.environ.get('POSTGRES_USER_RENDER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD_RENDER'),
+        'HOST': os.environ.get('POSTGRES_HOST_RENDER'),
+        'PORT': os.environ.get('POSTGRES_PORT_RENDER'),
     },
      'Evaluacion': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
