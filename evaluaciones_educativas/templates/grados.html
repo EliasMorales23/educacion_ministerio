@@ -104,5 +104,27 @@
         });
       });
     </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Seleccionar el formulario y el botón de submit
+        const form = document.querySelector(".card-body form");
+        const submitButton = document.querySelector(
+          '.btn-custom[type="submit"]'
+        );
+
+        if (form && submitButton) {
+          // Escuchar el evento de envío del formulario
+          form.addEventListener("submit", function () {
+            // 1. Deshabilitar el botón inmediatamente para prevenir doble clic
+            submitButton.disabled = true;
+
+            // 2. Cambiar el contenido para mostrar un spinner de carga en blanco
+            //    (usando la clase Bootstrap 'text-white' para mantener el color)
+            submitButton.innerHTML =
+              '<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> <span class="text-white">Guardando...</span>';
+          });
+        }
+      });
+    </script>
   </body>
 </html>

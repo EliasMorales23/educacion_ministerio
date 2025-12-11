@@ -27,8 +27,7 @@ load_dotenv(DOTENV_PATH)
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&6^kli45!=0kz%*1q%@rv7@skf8_vmjnwf3^!7fyluf!$r=4h+'
-
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY_EVALUACION')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -76,8 +75,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ministerio_educacion.wsgi.application'
-print(os.environ.get('POSTGRES_USER_EVALUACION'))
-print(os.environ.get('POSTGRES_DB_EVALUACION'))
+# print(os.environ.get('POSTGRES_USER_EVALUACION'))
+# print(os.environ.get('POSTGRES_DB_EVALUACION'))
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
