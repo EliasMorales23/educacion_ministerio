@@ -13,6 +13,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
+    netcat \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar dependencias
@@ -25,8 +26,8 @@ RUN pip install -r requirements.txt
 # Copiar el proyecto
 COPY . /app
 
-# ❌ NO correr collectstatic porque vos ya tenés la carpeta staticfiles
-# RUN python manage.py collectstatic --no-input
+# ❌ No correr collectstatic (ya tenés staticfiles)
+# ❌ No correr migraciones automáticamente
 
-# Ejecutar migraciones + levantar Gunicorn al iniciar el contenedor
-CMD ["sh", "-c", "python manage.py migrate --no-input && gunicorn ministerio_educacion.wsgi:application --bind 0.0.0.0:$PORT"]
+# Levanta Gunicorn
+CMD ["gunicorn", "ministerio_educacion.wsgi:application", "--bind", "0.0.0.0:8080"]
