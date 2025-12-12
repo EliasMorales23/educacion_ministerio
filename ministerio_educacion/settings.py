@@ -84,13 +84,9 @@ WSGI_APPLICATION = 'ministerio_educacion.wsgi.application'
 # POSTGRES_DB_NAME_GOOGLE = os.environ.get('POSTGRES_DB_NAME_GOOGLE')
 DATABASES ={
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB_RENDER'),
-        'USER': os.environ.get('POSTGRES_USER_RENDER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD_RENDER'),
-        'HOST': os.environ.get('POSTGRES_HOST_RENDER'),
-        'PORT': os.environ.get('POSTGRES_PORT_RENDER'),
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        },# The database file will be named db.sqlite3 in your project root
      'Evaluacion': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get('POSTGRES_DB_EVALUACION'),
