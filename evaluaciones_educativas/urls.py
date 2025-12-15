@@ -19,7 +19,9 @@ urlpatterns = [
     path('salir/',views.salir, name='salir'),
     path('',views.filtro_monitoreo, name='lista_filtro_monitoreo'),
     path('borrar_registro_alumno_sin_evaluaciono/<uuid:alumno_public_id>/',views.borrar_registro_alumno_sin_evaluacion, name='borrar_registro_alumno_sin_evaluacion'),
-   # path('',views.inicio_aplicador, name='inicio')
+    path('monitoreo_establecimientos_carga',views.monitoreo_establecimientos_carga, name='monitoreo_establecimientos_carga'),
+    path('monitoreo_establecimientos_sin_carga',views.monitoreo_establecimientos_sin_carga, name='monitoreo_establecimientos_sin_carga')
+    # path('',views.inicio_aplicador, name='inicio')
     # path('monitoreo/',views.monitoreo, name='monitoreo'),
 	
 ]

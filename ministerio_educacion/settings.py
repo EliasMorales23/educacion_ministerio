@@ -29,10 +29,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY_EVALUACION')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = ['https://louisiana-nikon-terminals-imports.trycloudflare.com'
 ]
 # Application definition
 
@@ -88,7 +88,7 @@ DATABASES ={
         'NAME': BASE_DIR / 'db.sqlite3',
         },# The database file will be named db.sqlite3 in your project root
      'Evaluacion': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_DB_EVALUACION'),
         'USER': os.environ.get('POSTGRES_USER_EVALUACION'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD_EVALUACION'),

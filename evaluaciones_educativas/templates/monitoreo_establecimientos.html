@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Secciones y Establecimientos</title>
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      /* ================= BASE ================= */
+      body {
+        background: linear-gradient(135deg, #eef2ff, #ffffff);
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+      }
+
+      h4 {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      /* ================= SIDEBAR ================= */
+      #sidebar-wrapper {
+        width: 70px;
+        background: #0a58ca;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 1030;
+        transition: width 0.3s ease;
+        overflow: hidden;
+        padding-top: 20px;
+      }
+
+      #sidebar-wrapper:hover {
+        width: 260px;
+      }
+
+      #sidebar-wrapper .nav-link {
+        color: white;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+      }
+
+      #sidebar-wrapper .nav-link span {
+        display: none;
+      }
+
+      #sidebar-wrapper:hover .nav-link span {
+        display: inline;
+      }
+
+      #sidebar-wrapper i {
+        font-size: 1.3rem;
+      }
+
+      #sidebar-wrapper .nav-link:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      /* ================= CONTENT ================= */
+      #content-area {
+        margin-left: 70px;
+        padding: 25px;
+        transition: margin-left 0.3s ease;
+      }
+
+      #sidebar-wrapper:hover + #content-area {
+        margin-left: 260px;
+      }
+
+      /* ================= CARD ================= */
+      .card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        background: linear-gradient(90deg, #0066cc, #004a99);
+        color: white;
+        text-align: center;
+        padding: 15px;
+      }
+
+      /* ================= TABLE ================= */
+      .table-responsive {
+        max-height: 70vh;
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        table-layout: fixed;
+        font-size: 0.78rem;
+      }
+
+      th,
+      td {
+        padding: 0.35rem 0.4rem;
+        text-align: center;
+        vertical-align: middle;
+        word-wrap: break-word;
+        white-space: normal;
+      }
+
+      thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+
+      /* Anchos inteligentes */
+      .col-cue {
+        width: 8%;
+      }
+      .col-escuela {
+        width: 22%;
+      }
+      .col-sector {
+        width: 7%;
+      }
+      .col-ambito {
+        width: 7%;
+      }
+      .col-region {
+        width: 8%;
+      }
+      .col-localidad {
+        width: 18%;
+      }
+      .col-depto {
+        width: 15%;
+      }
+      .col-grado {
+        width: 7%;
+      }
+
+      .bg-info-local {
+        background-color: #0d6efd !important;
+      }
+
+      /* ================= RESPONSIVE ================= */
+      @media (max-width: 1200px) {
+        table {
+          font-size: 0.72rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <div id="sidebar-wrapper">
+      <ul class="nav flex-column px-2">
+        <li class="nav-item">
+          <a href="{% url 'lista_filtro_monitoreo' %}" class="nav-link">
+            <i class="bi bi-search"></i><span>Filtro individual</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            href="{% url 'monitoreo_establecimientos_sin_carga' %}"
+            class="nav-link"
+          >
+            <i class="bi bi-book"></i><span>Establecimiento Sin carga</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            href="{% url 'monitoreo_establecimientos_carga' %}"
+            class="nav-link"
+          >
+            <i class="bi bi-book"></i><span>Establecimientos Con carga</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content-area">
+      <div class="container-fluid">
+        <div class="card">
+          <div class="card-header">
+            <h1>Datos de Secciones y Establecimientos</h1>
+            <h4>ESTABLECIMIENTOS Y GRADOS</h4>
+            <h5>{{ carga }}</h5>
+          </div>
+
+          <div class="card-body p-2">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th colspan="8" class="bg-info-local">
+                      Información del Establecimiento
+                    </th>
+                  </tr>
+                  <tr>
+                    <th class="col-cue">Cueanexo</th>
+                    <th class="col-escuela">Escuela</th>
+                    <th class="col-sector">Sector</th>
+                    <th class="col-ambito">Ámbito</th>
+                    <th class="col-region">Región</th>
+                    <th class="col-localidad">Localidad</th>
+                    <th class="col-depto">Departamento</th>
+                    <th class="col-grado">Grado</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for registro in resultados_consulta %}
+                  <tr>
+                    <td><strong>{{ registro.CUEANEXO }}</strong></td>
+                    <td class="text-start">{{ registro.ESCUELA }}</td>
+                    <td>{{ registro.SECTOR }}</td>
+                    <td>{{ registro.AMBITO }}</td>
+                    <td>{{ registro.REGION }}</td>
+                    <td>{{ registro.LOCALIDAD }}</td>
+                    <td>{{ registro.DEPARTAMENTO }}</td>
+                    <td>{{ registro.GRADO }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="8" class="text-muted">
+                      No se encontraron registros
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between">
+          {% if carga == 'CON CARGAS' %}
+          <form
+            method="post"
+            action="{% url 'monitoreo_establecimientos_carga' %}"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Descargar</button>
+          </form>
+          {% else %}
+          <form
+            method="post"
+            action="{% url 'monitoreo_establecimientos_sin_carga' %}"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Descargar</button>
+          </form>
+          {% endif %}
+          <div class="d-flex justify-content-end mt-3">
+            <a href="{% url 'salir' %}" class="btn btn-danger btn-sm">
+              Cerrar sesión
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

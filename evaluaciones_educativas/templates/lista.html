@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista</title>
+    <title>Lista de Secciones y Establecimientos</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -13,21 +13,20 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-    <link rel="stylesheet" href="evaluaciones_educativas/css/style.css" />
 
     <style>
+      /* --- Estilos Base --- */
       body {
         background: linear-gradient(135deg, #eef2ff, #ffffff);
         min-height: 100vh;
-        padding: 30px;
+        padding: 30px; /* Ajustado al segundo ejemplo */
       }
 
       .container-custom {
-        /* Para usar el máximo espacio disponible en la pantalla */
         width: 100%;
         max-width: none;
         margin: auto;
-        padding: 0 15px;
+        padding: 0 15px; /* Ajustado al segundo ejemplo */
       }
 
       .card {
@@ -39,102 +38,88 @@
       .card-header {
         background: linear-gradient(90deg, #0066cc, #004a99);
         color: white;
-        padding: 18px;
+        padding: 18px; /* Ajustado al segundo ejemplo */
         text-align: center;
       }
 
+      /* --- TABLA: Estilos para ajuste de contenido --- */
       table {
+        font-size: 0.85rem;
         width: 100%;
       }
 
-      /* --- NUEVOS ESTILOS PARA FORZAR EL AJUSTE VERTICAL Y CONTROLAR ANCHOS --- */
-
-      /* 1. Definir un layout de tabla fijo para respetar los anchos */
-      .table-fixed {
-        table-layout: fixed;
+      .table-responsive {
+        overflow-x: auto;
       }
 
-      /* 2. Permitir el salto de línea en todas las celdas */
+      .table-fixed {
+        table-layout: fixed; /* Clave para anchos porcentuales */
+      }
+
       .table-fixed th,
       .table-fixed td {
         white-space: normal; /* Permite que el texto salte de línea */
         overflow-wrap: break-word; /* Asegura que las palabras largas se rompan */
         word-break: break-word;
-        padding: 0.5rem 0.3rem; /* Reducimos un poco el padding estándar de Bootstrap */
+        padding: 0.4rem;
+        vertical-align: middle;
+        text-align: center;
       }
 
-      /* 3. Definir anchos fijos para las columnas. La suma total de anchos debe ser <= 100% o el ancho del contenedor. */
+      /* --- ANCHOS POR COLUMNA (Optimizado para 10 columnas) --- */
 
-      /* Datos del Alumno (5 columnas) */
+      /* 7 columnas de Información del Establecimiento */
       .table-fixed th:nth-child(1),
       .table-fixed td:nth-child(1) {
-        width: 10%;
-      } /* Nombre */
+        width: 12%; /* Cueanexo - Un poco más de ancho */
+      }
       .table-fixed th:nth-child(2),
       .table-fixed td:nth-child(2) {
-        width: 10%;
-      } /* Apellido */
+        width: 18%; /* Escuela - El más ancho */
+      }
       .table-fixed th:nth-child(3),
-      .table-fixed td:nth-child(3) {
-        width: 8%;
-      } /* DNI */
+      .table-fixed td:nth-child(3),
       .table-fixed th:nth-child(4),
-      .table-fixed td:nth-child(4) {
-        width: 7%;
-      } /* Seccion */
+      .table-fixed td:nth-child(4),
       .table-fixed th:nth-child(5),
-      .table-fixed td:nth-child(5) {
-        width: 7%;
-      } /* Turno */
-
-      /* Fluidez Lectora (8 columnas) */
+      .table-fixed td:nth-child(5),
       .table-fixed th:nth-child(6),
-      .table-fixed td:nth-child(6) {
-        width: 7%;
-      } /* Asistencia */
+      .table-fixed td:nth-child(6),
       .table-fixed th:nth-child(7),
       .table-fixed td:nth-child(7) {
-        width: 8%;
-      } /* P. Leídas */
-
-      /* Preguntas P1 a P6 (6 columnas pequeñas) */
-      .table-fixed th:nth-child(n + 8):nth-child(-n + 13),
-      .table-fixed td:nth-child(n + 8):nth-child(-n + 13) {
-        width: 3.5%; /* Ancho muy reducido para una respuesta de un solo dígito/letra */
-        font-size: 0.85rem;
+        width: 10%; /* Sector, Ámbito, Región, Localidad, Departamento - Anchos iguales */
       }
 
-      /* Acciones (1 columna) */
-      .table-fixed th:nth-child(14),
-      .table-fixed td:nth-child(14) {
-        width: 20%;
-        min-width: 140px; /* Asegura que haya espacio para los botones */
+      /* 3 columnas de Información de la Sección */
+
+      /* Grado/Año (Max 2do/3er Año/Grado) - 8% */
+      .table-fixed th:nth-child(8),
+      .table-fixed td:nth-child(8) {
+        width: 6%;
+        font-size: 0.8rem;
+      }
+      /* Sección (Max 1 dígito) - 3% */
+      .table-fixed th:nth-child(9),
+      .table-fixed td:nth-child(9) {
+        width: 5%;
+      }
+      /* Turno (Max 6 dígitos) - 5% */
+      .table-fixed th:nth-child(10),
+      .table-fixed td:nth-child(10) {
+        width: 6%;
+      }
+      /* La suma de todos los anchos debe ser 100%. (12+18+5*10 + 6+5+6 = 100%) */
+
+      /* Encabezados de grupo */
+      .bg-info-local {
+        background-color: #007bff !important; /* Estilo 'bg-alumno' */
       }
 
-      /* Ajuste de botones para caber en la celda de Acciones */
-      .d-inline-flex .btn-custom {
-        padding: 0.2rem 0.3rem;
-        font-size: 0.7rem;
-        white-space: nowrap;
-        display: inline-block;
+      .bg-info-general {
+        background-color: #28a745 !important; /* Estilo 'bg-comprension' */
       }
 
-      /* --- FIN DE ESTILOS AGREGADOS --- */
-
-      .btn-custom {
-        border-radius: 10px;
-        font-weight: 600;
-      }
-
-      /* Encabezados */
-      .bg-alumno {
-        background-color: #007bff !important;
-      }
-      .bg-comprension {
-        background-color: #28a745 !important;
-      }
-
-      /* ------- SIDEBAR HOVER AJUSTADO -------- */
+      /* --- Sidebar Hover del segundo ejemplo --- */
       #sidebar-wrapper {
         width: 70px;
         transition: width 0.35s ease;
@@ -169,14 +154,13 @@
         margin-right: 10px;
       }
 
-      /* Para que el contenido no quede tapado */
       #content-area {
-        margin-left: 90px;
+        margin-left: 90px; /* Ajustado al segundo ejemplo */
         transition: margin-left 0.35s ease;
       }
 
       #sidebar-wrapper:hover + #content-area {
-        margin-left: 300px;
+        margin-left: 300px; /* Ajustado al segundo ejemplo */
       }
     </style>
   </head>
@@ -185,19 +169,18 @@
     <div id="sidebar-wrapper">
       <ul class="nav flex-column px-2">
         <li class="nav-item">
-          <a href="{% url 'inicio'%}"class="nav-link">
+          <a href="#" class="nav-link">
             <i class="bi bi-house"></i> <span>Home</span>
           </a>
         </li>
         <li class="nav-item">
-          <a href="{% url 'lista_grado' grado='SEGUNDO'%}" class="nav-link">
+          <a href="#" class="nav-link">
             <i class="bi bi-book"></i>
             <span>Examen Fluidez Segundo</span>
           </a>
         </li>
-
         <li class="nav-item">
-          <a href="{% url 'lista_grado' grado='TERCERO'%}" class="nav-link">
+          <a href="#" class="nav-link">
             <i class="bi bi-book"></i>
             <span>Examen Fluidez Tercero</span>
           </a>
@@ -209,101 +192,54 @@
       <div class="container container-custom">
         <div class="card mb-4">
           <div class="card-header">
-            <h1>Evaluación de Fluidez Lectora</h1>
-            <h4>GRADO: {{nombre_grado}}</h4>
+            <h1>Datos de Secciones y Establecimientos</h1>
+            <h4>FILTROS APLICADOS</h4>
           </div>
 
-          <div class="card-body">
+          <div class="card-body p-1">
             <div class="table-responsive">
-              <table
-                class="table table-striped table-hover align-middle table-fixed"
-              >
+              <table class="table table-striped table-hover table-fixed">
                 <thead class="table-dark">
                   <tr>
-                    <th colspan="5" class="text-center bg-alumno">
-                      Datos del Alumno
+                    <th colspan="7" class="text-center bg-info-local">
+                      Información del Establecimiento
                     </th>
-                    <th colspan="9" class="text-center bg-comprension">
-                      Fluidez Lectora (Respuestas)
+                    <th colspan="3" class="text-center bg-info-general">
+                      Información de la Sección
                     </th>
                   </tr>
-
                   <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>DNI</th>
-                    <th>Seccion</th>
+                    <th>Cueanexo</th>
+                    <th>Escuela</th>
+                    <th>Sector</th>
+                    <th>Ámbito</th>
+                    <th>Región</th>
+                    <th>Localidad</th>
+                    <th>Departamento</th>
+                    <th>Grado/Año</th>
+                    <th>Sección</th>
                     <th>Turno</th>
-                    <th>Asistencia</th>
-                    <th>P. Leídas</th>
-                    <th>P1</th>
-                    <th>P2</th>
-                    <th>P3</th>
-                    <th>P4</th>
-                    <th>P5</th>
-                    <th>P6</th>
-                    <th class="text-center bg-alumno">Accion</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {% for eval in evaluciones %}
+                  {% for registro in resultados_consulta %}
                   <tr>
-                    <td><strong>{{ eval.alumno.nombre }}</strong></td>
-                    <td>{{ eval.alumno.apellido }}</td>
-                    <td>{{ eval.alumno.dni }}</td>
-                    <td>{{ eval.alumno.seccion.seccion }}</td>
-                    <td>{{ eval.alumno.seccion.turno }}</td>
-                    <td>{{ eval.asistencia }}</td>
-                    <td>{{ eval.cantidad_palabras_leidas|default:'-' }}</td>
-
-                    <td class="text-center">
-                      {{ eval.pregunta_1|default:'-' }}
-                    </td>
-                    <td class="text-center">
-                      {{ eval.pregunta_2|default:'-' }}
-                    </td>
-                    <td class="text-center">
-                      {{ eval.pregunta_3|default:'-' }}
-                    </td>
-                    <td class="text-center">
-                      {{ eval.pregunta_4|default:'-' }}
-                    </td>
-                    <td class="text-center">
-                      {{ eval.pregunta_5|default:'-' }}
-                    </td>
-                    <td class="text-center">
-                      {{ eval.pregunta_6|default:'-' }}
-                    </td>
-
-                    <td class="text-center">
-                      <div
-                        class="d-inline-flex flex-wrap gap-1 justify-content-center"
-                      >
-                        <a
-                          href="{% url 'editar_alumno' alumno_public_id=eval.alumno.public_id %}"
-                          class="btn btn-sm btn-outline-primary btn-custom"
-                          title="Editar Datos del Alumno"
-                        >
-                          <i class="bi bi-person-fill"></i> Editar
-                        </a>
-
-                        <a
-                          href="{% url 'editar_evaluacion' alumno_public_id=eval.alumno.public_id %}"
-                          class="btn btn-sm btn-outline-success btn-custom"
-                          title="Editar Evaluación de Fluidez"
-                        >
-                          <i class="bi bi-journal-check"></i> Eval.
-                        </a>
-
-                        <a
-                          href="{% url 'borrar_registro_alumno' alumno_public_id=eval.alumno.public_id %}"
-                          class="btn btn-sm btn-outline-danger btn-custom"
-                          title="Borrar Registro del Alumno"
-                        >
-                          <i class="bi bi-x-circle-fill"></i> Borrar
-                        </a>
-                      </div>
+                    <td><strong>{{ registro.CUEANEXO }}</strong></td>
+                    <td>{{ registro.ESCUELA }}</td>
+                    <td>{{ registro.SECTOR }}</td>
+                    <td>{{ registro.AMBITO }}</td>
+                    <td>{{ registro.REGION }}</td>
+                    <td>{{ registro.LOCALIDAD }}</td>
+                    <td>{{ registro.DEPARTAMENTO }}</td>
+                    <td>{{ registro.GRADO }}</td>
+                    <td>{{ registro.SECCION }}</td>
+                    <td>{{ registro.TURNO }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="10" class="text-center text-muted">
+                      No se encontraron registros
                     </td>
                   </tr>
                   {% endfor %}
@@ -313,32 +249,10 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between">
-          <a href="{% url 'grados' %}" class="btn btn-primary btn-custom"
-            >Añadir Alumno</a
-          >
-          
+        <div class="d-flex justify-content-end mt-3">
           <a href="{% url 'salir' %}" class="btn btn-danger btn-custom"
             >Cerrar Sesión</a
           >
-          {% if grado_public_id %}
-    {# Opción 1: El ID existe, botón funcional (con etiqueta <a>) #}
-    <a
-        href="{% url 'excel' grado_public_id=grado_public_id %}"
-        class="btn btn-danger btn-custom"
-    >
-        Descargar
-    </a>
-{% else %}
-    {# Opción 2: El ID NO existe, botón deshabilitado (con etiqueta <button>) #}
-    <button 
-        class="btn btn-danger btn-custom"
-        disabled 
-        title="El ID del grado no está disponible para la descarga."
-    >
-        Descargar
-    </button>
-{% endif %}
         </div>
       </div>
     </div>
