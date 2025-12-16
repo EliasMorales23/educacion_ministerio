@@ -32,7 +32,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY_EVALUACION')
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = [''
+CSRF_TRUSTED_ORIGINS = ['https://educacion-ministerio-monitoreo.onrender.com'
 ]
 # Application definition
 
