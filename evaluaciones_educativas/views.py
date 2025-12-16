@@ -408,6 +408,7 @@ def filtro_monitoreo(request):
 @login_required
 def monitoreo_establecimientos_sin_carga(request):
     lista=[]
+    texto='SIN CARGA'
     resultados=None
     try:
         conn=psycopg2.connect(host=os.environ.get('POSTGRES_HOST_EVALUACION'), database=os.environ.get('POSTGRES_DB_EVALUACION'), user=os.environ.get('POSTGRES_USER_EVALUACION'), password=os.environ.get('POSTGRES_PASSWORD_EVALUACION'))
@@ -434,31 +435,28 @@ def monitoreo_establecimientos_sin_carga(request):
                                 )order by e.cueanexo;"""
                 cur.execute(consulta)
                 resultados=cur.fetchall()
-                #print(resultados)
                 print("Consulta ejecutada correctamente.")
+                for i in resultados:
+                    resultados_dict={
+                    'CUEANEXO':i[0],
+                    'ESCUELA':i[1],
+                    'SECTOR':i[2],
+                    'AMBITO':i[3],
+                    'REGION':i[4],
+                    'LOCALIDAD':i[5],
+                    'DEPARTAMENTO':i[6],
+                    'GRADO':i[7]
+                    }  
+                    lista.append(resultados_dict)
     except Exception as e:
-    # Si hay un error, el bloque 'with conn' hace conn.rollback()
         print(f"Error, se hizo rollback: {e}")
-    
-    for i in resultados:
-        resultados_dict={
-        'CUEANEXO':i[0],
-        'ESCUELA':i[1],
-        'SECTOR':i[2],
-        'AMBITO':i[3],
-        'REGION':i[4],
-        'LOCALIDAD':i[5],
-        'DEPARTAMENTO':i[6],
-        'GRADO':i[7]
-        }  
-        lista.append(resultados_dict)
-    
+
     contexto={
         'resultados_consulta':lista,
-        'carga':'SIN CARGA'
+        'carga':texto
     }
     if request.method == "POST":
-        wb=descargar_excel_monitoreo(lista)
+        wb=descargar_excel_monitoreo(lista,texto)
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
@@ -467,15 +465,13 @@ def monitoreo_establecimientos_sin_carga(request):
         )
 
         wb.save(response)
-        return response
-        #return render(request, "monitoreo_establecimientos.html",contexto)
-    #Enviarlos a la consulta como parametro en la consulta completa a la base
-    #para traer todos los establecimeitnos que no cargaron nada 
+        return response 
     return render(request,"monitoreo_establecimientos.html", contexto)
 
 @login_required
 def monitoreo_establecimientos_carga(request):
     lista=[]
+    texto='CON CARGA'
     resultados=None
     try:
         conn=psycopg2.connect(host=os.environ.get('POSTGRES_HOST_EVALUACION'), database=os.environ.get('POSTGRES_DB_EVALUACION'), user=os.environ.get('POSTGRES_USER_EVALUACION'), password=os.environ.get('POSTGRES_PASSWORD_EVALUACION'))
@@ -502,30 +498,28 @@ def monitoreo_establecimientos_carga(request):
                                 )order by e.cueanexo; """
                 cur.execute(consulta)
                 resultados=cur.fetchall()
-                #print(resultados)
                 print("Consulta ejecutada correctamente.")
+                for i in resultados:
+                    resultados_dict={
+                    'CUEANEXO':i[0],
+                    'ESCUELA':i[1],
+                    'SECTOR':i[2],
+                    'AMBITO':i[3],
+                    'REGION':i[4],
+                    'LOCALIDAD':i[5],
+                    'DEPARTAMENTO':i[6],
+                    'GRADO':i[7]
+                    }  
+                    lista.append(resultados_dict)
     except Exception as e:
-    # Si hay un error, el bloque 'with conn' hace conn.rollback()
         print(f"Error, se hizo rollback: {e}")
-    
-    for i in resultados:
-        resultados_dict={
-        'CUEANEXO':i[0],
-        'ESCUELA':i[1],
-        'SECTOR':i[2],
-        'AMBITO':i[3],
-        'REGION':i[4],
-        'LOCALIDAD':i[5],
-        'DEPARTAMENTO':i[6],
-        'GRADO':i[7]
-        }  
-        lista.append(resultados_dict)
+
     contexto={
         'resultados_consulta':lista,
-        'carga':'CON CARGAS'
+        'carga':texto
     }
     if request.method == "POST":
-        wb=descargar_excel_monitoreo(lista)
+        wb=descargar_excel_monitoreo(lista,texto)
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
@@ -535,25 +529,19 @@ def monitoreo_establecimientos_carga(request):
 
         wb.save(response)
         return response
-    #Enviarlos a la consulta como parametro en la consulta completa a la base
-    #para traer todos los establecimeitnos que no cargaron nada 
     return render(request,"monitoreo_establecimientos.html", contexto)
 #------------------------------------------------------------
 #DESCARGA DE MONITOREO
-def descargar_excel_monitoreo(resultados):
+def descargar_excel_monitoreo(resultados,texto):
     
     # 3. Generar el contenido del Excel (lo mismo que tenías)
     wb = Workbook()
     ws = wb.active
     fecha_hora_actual = datetime.now()
-    #ws['A1'] = f'CUEANEXO: {instancia_grado.cueanexo}'
     ws['A1'] = f'FECHA Y HORA:  {fecha_hora_actual.strftime("%d/%m/%Y %I:%M:%S %p")}'
+    ws['G1'] = f'ESTABLECIMIENTOS Y GRADOS {texto}'
     lista=['CUEANEXO','ESCUELA','SECTOR','ÁMBITO','REGIÓN','LOCALIDAD','DEPARTAMENTO','GRADO']
-    #print(alumnos)
     ws.append(lista)
-    #print(resultados)
-    # print(type(resultados))
-    # print(resultados[1]['CUEANEXO'])
     for i,v in enumerate(resultados):
         ws[f'A{i + 2}']=resultados[i]['CUEANEXO']
         ws[f'B{i + 2}']=resultados[i]['ESCUELA']
@@ -563,9 +551,6 @@ def descargar_excel_monitoreo(resultados):
         ws[f'F{i + 2}']=resultados[i]['LOCALIDAD']
         ws[f'G{i + 2}']=resultados[i]['DEPARTAMENTO']
         ws[f'H{i + 2}']=resultados[i]['GRADO']
-    
-    
-    # 5. Retornar la respuesta al navegador
     return wb
 
 #--------------------------------------------------------
