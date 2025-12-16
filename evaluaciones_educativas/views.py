@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+import pytz
 from django.http import HttpResponse
 from django.template import loader
 from evaluaciones_educativas.models import *
@@ -537,8 +539,10 @@ def descargar_excel_monitoreo(resultados,texto):
     # 3. Generar el contenido del Excel (lo mismo que tenías)
     wb = Workbook()
     ws = wb.active
-    fecha_hora_actual = datetime.now()
-    ws['A1'] = f'FECHA Y HORA:  {fecha_hora_actual.strftime("%d/%m/%Y %I:%M:%S %p")}'
+    fecha_hora_actual = timezone.now()
+    zona_local = pytz.timezone('America/Argentina/Buenos_Aires')
+    fecha_hora_actual_argentina=fecha_hora_actual.astimezone(zona_local)
+    ws['A1'] = f'FECHA Y HORA:  {fecha_hora_actual_argentina.strftime("%d/%m/%Y %I:%M:%S %p")}'
     ws['G1'] = f'ESTABLECIMIENTOS Y GRADOS {texto}'
     lista=['CUEANEXO','ESCUELA','SECTOR','ÁMBITO','REGIÓN','LOCALIDAD','DEPARTAMENTO','GRADO']
     ws.append(lista)

@@ -29,7 +29,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY_EVALUACION')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://louisiana-nikon-terminals-imports.trycloudflare.com'
