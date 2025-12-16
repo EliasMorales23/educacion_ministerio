@@ -32,7 +32,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY_EVALUACION')
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://louisiana-nikon-terminals-imports.trycloudflare.com'
+CSRF_TRUSTED_ORIGINS = [''
 ]
 # Application definition
 
